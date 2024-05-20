@@ -1,0 +1,16 @@
+    <resources xmlns:tools="http://schemas.android.com/tools">
+        <!-- Base application theme. -->
+
+        <style
+            name="MyTheme.Splash"
+            parent="Theme.Material3.DayNight.NoActionBar"
+            >
+            <item name="android:windowIsTranslucent">true</item>
+            <item name="android:windowBackground">@drawable/gradient_color</item>
+            <item name="windowNoTitle">true</item>
+            <item name="android:windowFullscreen">true</item>
+            <item name="android:windowContentOverlay">@null</item>
+            <item name="windowActionBar">true</item>
+
+        </style>
+    </resources>

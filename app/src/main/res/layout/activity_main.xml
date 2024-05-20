@@ -1,0 +1,27 @@
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/gradient_color"
+    >
+
+
+    <ImageView android:id="@+id/logo"
+        android:src="@drawable/logo"
+        android:contentDescription="logo"
+        android:layout_width="134.96dp"
+        android:layout_height="135.94dp" />
+
+    <Button
+        android:id="@+id/get_started"
+        android:layout_width="300dp"
+        android:background="@drawable/round_corners"
+        android:layout_height="48dp"
+        android:text="Get Started">
+
+    </Button>
+
+</LinearLayout>

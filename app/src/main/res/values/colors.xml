@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- my_mood colors -->
+
+	<color name="colorPrimary">#008577</color>
+	<color name="colorPrimaryDark">#00574B</color>
+	<color name="colorAccent">#D81B60</color>
+
+	<color name="_bg__frame_6_ek1_color">#6F4932</color>
+	<color name="my_mood_color">#ECE9E7</color>
+	<color name="history_color">#D1C5BE</color>
+	<color name="background_ek2_color">#F7F4F2</color>
+	<color name="overjoyed_color">#89776B</color>
+	<color name="sep_12_color">#745E50</color>
+	<!-- diary colors -->
+
+
+	<color name="diary_color">#000000</color>
+
+		<!-- landing_1 colors -->
+
+
+	<color name="how_s_you_feeling_today_color">#000000</color>
+	<color name="l1_spacebody_color">#CAEFFF</color>
+	<color name="landing1_nextbutton_color">#7000FF</color>
+
+	<!-- home_screen colors -->
+	<color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="mood_blue">#056DCE</color>
+    <color name="moodTitle_blue">#0e28b3</color>
+    <color name="chat_content_orange">#C05F1D</color>
+    <color name="chat_title_orange">#392416</color>
+    <color name="diary_title_yellow">#FFCC4D</color>
+    <color name="diary_content_yellow">#908C29</color>
+    <color name="mood_content_blue">#378ad8</color>
+    <color name="transparent">#00000000</color>
+    <color name="chat_padding">#664500</color>
+
+
+</resources>
