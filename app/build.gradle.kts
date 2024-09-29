@@ -46,6 +46,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.3.5")
 
     // RecyclerView dependency
     implementation("androidx.recyclerview:recyclerview:1.3.2")
@@ -59,15 +60,13 @@ dependencies {
 
     // TensorFlow Lite for on-device machine learning
     implementation("org.tensorflow:tensorflow-lite:2.16.1") // Check for updates
-//
-//    // CameraX dependencies for camera access
-//    implementation("androidx.camera:camera-core:1.3.4")
-//    implementation("androidx.camera:camera-camera2:1.3.4")
-//    implementation("androidx.camera:camera-lifecycle:1.3.4")
-//    implementation("androidx.camera:camera-view:1.3.4") // Use stable version
-////    implementation(":opencv")
+
+
+
+    implementation("com.google.guava:guava:27.1-android")
     // Face Detection
-    implementation("com.google.mlkit:face-detection:16.1.5")
+//    implementation("com.google.mlkit:face-detection:16.1.5")
+    implementation("com.google.android.gms:play-services-mlkit-face-detection:17.1.0")
 
 // CameraX
     var camerax_version = "1.3.0-alpha04"
@@ -81,6 +80,9 @@ dependencies {
 
 // CameraSource
     implementation ("com.google.android.gms:play-services-vision-common:19.1.3")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
+
 
 
 
