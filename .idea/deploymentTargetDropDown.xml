@@ -2,25 +2,25 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="FaceDetectionActivity">
+      <entry key="DatabaseCreationClass">
         <State />
       </entry>
-      <entry key="HomeActivity (1)">
+      <entry key="LoginActivity">
         <State />
       </entry>
-      <entry key="MainActivity">
-        <State />
-      </entry>
-      <entry key="ModelActivity">
-        <State />
-      </entry>
-      <entry key="TestFaceDetection">
+      <entry key="NavBarActivity">
         <State />
       </entry>
       <entry key="app">
         <State />
       </entry>
+      <entry key="chat_screen">
+        <State />
+      </entry>
       <entry key="splash_screen_activity">
+        <State />
+      </entry>
+      <entry key="usingllama">
         <State />
       </entry>
     </value>

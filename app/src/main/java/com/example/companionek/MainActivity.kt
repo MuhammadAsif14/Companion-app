@@ -22,10 +22,15 @@ class MainActivity : Activity() {
         logo = findViewById<View>(R.id.logo) as ImageView
         val get_started = findViewById<Button>(R.id.get_started)
         get_started.setOnClickListener {
-            val myIntent: Intent = Intent(this,landing_1_activity::class.java)
+
+            val myIntent: Intent=Intent(this,LoginActivity::class.java)
+//            val myIntent: Intent = Intent(this,landing_1_activity::class.java)
             myIntent.putExtra("key", value) //Optional parameters
+
             this.startActivity(myIntent)
+
         }
+        
 
     }
 }

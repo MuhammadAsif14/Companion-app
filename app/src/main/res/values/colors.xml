@@ -37,5 +37,22 @@
     <color name="transparent">#00000000</color>
     <color name="chat_padding">#664500</color>
 
+	//for the singup login page
+	<color name="colorPrimary1">#FFFFFF</color>
+	<color name="colorPrimaryDark1">#FFFFFF</color>
+	<color name="colorAccent1">#FFFFFF</color>
+	<color name="textInputLayout">#96ffffff</color>
+
+	<color name="text_morning">#FFD700</color> <!-- Gold color for morning -->
+	<color name="text_afternoon">#FF9800</color> <!-- OrangeRed color for afternoon -->
+	<color name="text_evening">#1E90FF</color> <!-- DodgerBlue color for evening -->
+
+	<color name="edittext_morning_bg">#FFFACD</color> <!-- LemonChiffon for morning -->
+	<color name="edittext_afternoon_bg">#352302</color> <!-- Moccasin for afternoon -->
+	<color name="edittext_evening_bg">#D3D3D3</color> <!-- LightGray for evening -->
+
+	<color name="button_morning_bg">#FFB6C1</color> <!-- LightPink for morning -->
+	<color name="button_afternoon_bg">#87CEFA</color> <!-- LightSkyBlue for afternoon -->
+	<color name="button_evening_bg">#A3C8E6</color> <!-- SteelBlue for evening -->
 
 </resources>

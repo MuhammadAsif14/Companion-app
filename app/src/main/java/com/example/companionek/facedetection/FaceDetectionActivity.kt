@@ -58,7 +58,7 @@ class FaceDetectionActivity : AppCompatActivity() {
 
     // Load MobileNetV2 model from assets
     private fun loadModel(): Interpreter {
-        val assetFileDescriptor = assets.openFd("model.tflite")
+        val assetFileDescriptor = assets.openFd("BestModel66.tflite")
         val inputStream = assetFileDescriptor.createInputStream()
         val modelBytes = inputStream.readBytes()
         val buffer = ByteBuffer.allocateDirect(modelBytes.size).order(ByteOrder.nativeOrder())
@@ -192,7 +192,7 @@ class FaceDetectionActivity : AppCompatActivity() {
     }
 
 
-    private fun cropFace(faceRect: Rect, bitmap: Bitmap): Bitmap {
+    fun cropFace(faceRect: Rect, bitmap: Bitmap): Bitmap {
         return try {
             // Ensure the faceRect fits within the bitmap boundaries
             val clampedRect = Rect(
@@ -227,7 +227,6 @@ class FaceDetectionActivity : AppCompatActivity() {
     }
 
 
-    // Run MobileNetV2 model to get emotion prediction
     // Run MobileNetV2 model to get emotion prediction
     private fun runModel(input: ByteBuffer): FloatArray {
         val output = Array(1) { FloatArray(7) } // Model returns 1x7 array (2D array)

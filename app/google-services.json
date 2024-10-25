@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "894734698191",
+    "project_id": "companion-11996",
+    "storage_bucket": "companion-11996.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:894734698191:android:39c4836a7795b48cc119ba",
+        "android_client_info": {
+          "package_name": "com.example.companionek"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDciE8JxTRkclFlEyRJPEVE3C4Sqw723hU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
