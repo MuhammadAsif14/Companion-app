@@ -127,6 +127,18 @@ class chat_screen: AppCompatActivity() {
                 chatSessionRef = database.getReference("user/$userId/chatSessions/$chatSessionId")
 
                 Toast.makeText(this, "chatSessionID: $chatSessionId", Toast.LENGTH_LONG).show()
+                // Assume userId and sessionId are already defined
+                val emotionsList = listOf( "sad","happy", "neutral")
+
+                // Save emotions to the session
+                chatSessionRef.child("emotions").setValue(emotionsList)
+                    .addOnSuccessListener {
+                        Log.d("Emotion", "Emotions saved successfully")
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.e("Emotion", "Failed to save emotions: ", exception)
+                    }
+
             }
 
 

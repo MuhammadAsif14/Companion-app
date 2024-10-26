@@ -2,6 +2,7 @@ package com.example.companionek
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -13,6 +14,11 @@ import com.example.companionek.adapter.ChatAdapter
 import com.example.companionek.adapter.DiaryAdapter
 import com.example.companionek.adapter.MoodAdapter
 import com.example.companionek.utils.DiaryItems
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import java.util.Date
 
 
@@ -48,6 +54,10 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var mood_title: TextView
     private lateinit var chat_title: TextView
     private lateinit var diary_title: TextView
+
+
+    private lateinit var database: DatabaseReference
+    private var userId = FirebaseAuth.getInstance().currentUser?.uid
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -152,14 +162,53 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
-    private fun getUserChatData() {
-        for(i in cTitle.indices){
-            val chat = ChatItems(cImageId[i],cTitle[i], cText[i])
-            newArrayList2.add(chat)
-        }
-        newRecyclerView2.adapter = ChatAdapter(newArrayList2)
+//    private fun getUserChatData() {
+//        for(i in cTitle.indices){
+//            val chat = ChatItems(cImageId[i],cTitle[i], cText[i],"avc")
+//            newArrayList2.add(chat)
+//        }
+//        newRecyclerView2.adapter = ChatAdapter(newArrayList2)
+//
+//    }
+private fun getUserChatData() {
+    userId?.let { uid ->
+        // Retrieve chat sessions for the user
+        database.child("user").child(uid).child("chatSessions").addListenerForSingleValueEvent(object :
+            ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                newArrayList2.clear() // Clear the list before adding new data
+                for (sessionSnapshot in dataSnapshot.children) {
+                    val emotions = sessionSnapshot.child("emotion").children.map { it.getValue(String::class.java) ?: "" }
+                    val sessionId = sessionSnapshot.key ?: "" // Get the session ID
 
+                    // Create a ChatItems instance for this chat session
+                    val chatItem = ChatItems(
+                        image = R.drawable.happy_emoji, // Choose an appropriate image
+                        chatTitle = emotions.joinToString(", "),
+                        text = "Chat session with ${emotions.joinToString(", ")} emotions.",
+                        sessionId = sessionId // Pass the session ID here
+                    )
+                    newArrayList2.add(chatItem) // Add the session item to the list
+                }
+
+                // Notify the adapter of the data change
+                newRecyclerView2.adapter = ChatAdapter(newArrayList2, ::onChatItemClick)
+            }
+            private fun onChatItemClick(sessionId: String) {
+                // Start the chat screen activity and pass the session ID
+                val intent = Intent(this@HomeActivity, chat_screen::class.java)
+                intent.putExtra("SESSION_ID", sessionId) // Pass the session ID
+                startActivity(intent)
+            }
+
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("ChatMenuFragment", "Error retrieving chat data: ${databaseError.message}")
+            }
+        })
     }
+}
+
 
     private fun getUserWeekData() {
         for(i in wTitle.indices){
