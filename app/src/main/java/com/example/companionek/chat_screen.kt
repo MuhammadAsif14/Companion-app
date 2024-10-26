@@ -12,6 +12,7 @@ import android.util.Log
 import android.util.Size
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,12 +25,21 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.companionek.data.ChatMessage
 import com.example.companionek.data.Message
 import com.example.companionek.utils.Constants.OPEN_GOOGLE
 import com.example.companionek.utils.Constants.OPEN_SEARCH
 import com.example.companionek.utils.Constants.RECEIVE_ID
 import com.example.companionek.utils.Constants.SEND_ID
 import com.example.companionek.utils.Time
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.GenericTypeIndicator
+import com.google.firebase.database.MutableData
+import com.google.firebase.database.Transaction
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
@@ -71,6 +81,15 @@ class chat_screen: AppCompatActivity() {
     private lateinit var et_message: EditText
     private lateinit var adapter: MessagingAdapter
     private lateinit var btn_send: Button
+    private lateinit var cameraVector: ImageView
+
+    private lateinit var chatSessionRef: DatabaseReference
+    private lateinit var database:FirebaseDatabase
+    private var userId: String? = null
+    private var chatSessionId: String? = null
+
+
+
     private val botList = listOf("M.A.M", "Ayesha", "Nizam", "Asif")
 
     private val client = OkHttpClient()
@@ -84,6 +103,7 @@ class chat_screen: AppCompatActivity() {
         rv_messages = findViewById(R.id.rv_messages) // Get the RecyclerView
         et_message = findViewById(R.id.et_message) // Get the EditText
         btn_send = findViewById(R.id.btn_send)
+
         // Initialize camera executor
         cameraExecutor = Executors.newSingleThreadExecutor()
         // Check for camera permission
@@ -94,7 +114,30 @@ class chat_screen: AppCompatActivity() {
                 Toast.makeText(this, "Camera permission is required to use FER feature.", Toast.LENGTH_SHORT).show()
 
             }
+
         }
+        database = FirebaseDatabase.getInstance()
+        userId = FirebaseAuth.getInstance().currentUser?.uid
+
+        // Initialize session ID and session reference
+        if (userId != null) {
+            // Check if the chatSessionId already exists before generating a new one
+            if (chatSessionId == null) {
+                chatSessionId = database.getReference("user/$userId/chatSessions").push().key
+                chatSessionRef = database.getReference("user/$userId/chatSessions/$chatSessionId")
+
+                Toast.makeText(this, "chatSessionID: $chatSessionId", Toast.LENGTH_LONG).show()
+            }
+
+
+
+            Toast.makeText(this, "chatSessionID:${chatSessionId}", Toast.LENGTH_LONG).show()
+
+        }else{
+            Toast.makeText(this, "user id from database is null", Toast.LENGTH_LONG).show()
+
+        }
+
         requestCameraPermission()
         // Request camera permission
 
@@ -104,6 +147,206 @@ class chat_screen: AppCompatActivity() {
 
         val random = (0..3).random()
         customBotMessage("Hello! Today you're speaking with ${botList[random]}, how may I help?")
+        cameraVector=findViewById(R.id.cameraVector)
+        cameraVector.setOnClickListener {
+            // Handle the click event here
+            openTestFaceDetectionActivity() // Replace this with your desired action
+        }
+    }
+
+
+
+    private fun sendMessage() {
+        val message = et_message.text.toString()
+        val timeStamp = Time.timeStamp()
+
+
+
+        if (message.isNotEmpty()) {
+            //Adds it to our local list
+            messagesList.add(Message(message, SEND_ID, timeStamp))
+            et_message.setText("")
+
+            adapter.insertMessage(Message(message, SEND_ID, timeStamp))
+            rv_messages.scrollToPosition(adapter.itemCount - 1)
+            saveChatMessage(message, "user") // Save user's message
+
+            try {
+                fetchAnswerFromHuggingFace(message)
+            } catch (e: JSONException) {
+                throw RuntimeException(e)
+            }
+        }
+    }
+
+    // Function to save chat messages under the current session
+    fun saveChatMessage(messageText: String, sender: String) {
+        if (userId != null && chatSessionId != null) {
+            val chatId = chatSessionRef.push().key // Generate a unique chat ID
+            if (chatId != null) {
+                val chatMessage = ChatMessage(
+                    message = messageText,
+                    timestamp = System.currentTimeMillis(),
+                    sender = sender
+                )
+
+                // Save message under the specific session ID and chat ID
+                chatSessionRef.child("$chatId").setValue(chatMessage)
+                    .addOnSuccessListener {
+                        Log.d("ChatMessage", "Message saved to Firebase: $messageText")
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.e("ChatMessage", "Failed to save message: ", exception)
+                    }
+            }
+        }
+    }
+
+    //to update the emotion of the user for each seesion
+    fun addEmotionToSession(emotion: String) {
+        if (userId != null && chatSessionId != null) {
+            // Reference the emotion list in the session node
+            val emotionListRef = chatSessionRef.child("$chatSessionId/emotion")
+
+            // Use a transaction to safely add the new emotion to the list to update use following code
+//            val detectedEmotion = "happy" // Example emotion detected
+//            addEmotionToSession(detectedEmotion)
+            emotionListRef.runTransaction(object : Transaction.Handler {
+                override fun doTransaction(currentData: MutableData): Transaction.Result {
+                    val currentList = currentData.getValue(object : GenericTypeIndicator<MutableList<String>>() {}) ?: mutableListOf()
+                    currentList.add(emotion)
+                    currentData.value = currentList
+                    return Transaction.success(currentData)
+                }
+
+                override fun onComplete(error: DatabaseError?, committed: Boolean, currentData: DataSnapshot?) {
+                    if (error != null) {
+                        Log.e("ChatSession", "Failed to update emotion list: ", error.toException())
+                    } else {
+                        Log.d("ChatSession", "Emotion added to session: $emotion")
+                    }
+                }
+            })
+        }
+    }
+
+
+
+    private fun botResponse(message: String) {
+        val timeStamp = Time.timeStamp()
+
+        GlobalScope.launch {
+            //Fake response delay
+            delay(1000)
+
+            withContext(Dispatchers.Main) {
+                //Gets the response
+                val response = message
+
+                //Adds it to our local list
+                messagesList.add(Message(response, RECEIVE_ID, timeStamp))
+
+                //Inserts our message into the adapter
+                adapter.insertMessage(Message(response, RECEIVE_ID, timeStamp))
+
+                //Scrolls us to the position of the latest message
+                rv_messages.scrollToPosition(adapter.itemCount - 1)
+
+
+                //save chatbot's response to database
+                saveChatMessage(response, "bot") // Save bot's response
+
+                //Starts Google
+                when (response) {
+                    OPEN_GOOGLE -> {
+                        val site = Intent(Intent.ACTION_VIEW)
+                        site.data = Uri.parse("https://www.google.com/")
+                        startActivity(site)
+                    }
+                    OPEN_SEARCH -> {
+                        val site = Intent(Intent.ACTION_VIEW)
+                        val searchTerm: String? = message.substringAfterLast("search")
+                        site.data = Uri.parse("https://www.google.com/search?&q=$searchTerm")
+                        startActivity(site)
+                    }
+
+                }
+            }
+        }
+    }
+    private fun fetchAnswerFromHuggingFace(userInput: String) {
+        val apiKey = "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"  // Replace with your API key
+
+        // JSON payload for the request
+        val jsonObject = JSONObject().apply {
+            put("model", "meta-llama/Llama-3.2-1B-Instruct")
+            put("messages", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("role", "user")
+                    put("content", userInput)
+                })
+            })
+            put("max_tokens", 500)
+            put("stream", false)
+        }
+
+        // Build the request
+        val requestBody = RequestBody.create(
+            "application/json; charset=utf-8".toMediaType(),
+            jsonObject.toString()
+        )
+        val request = Request.Builder()
+            .url("https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-1B-Instruct/v1/chat/completions")
+            .addHeader("Authorization", "Bearer $apiKey")
+            .addHeader("Content-Type", "application/json")
+            .post(requestBody)
+            .build()
+
+        // Make the API call
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()  // Handle the error
+                runOnUiThread {
+                    botResponse(e.message.toString())
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!it.isSuccessful) {
+                        val errorBody = response.body?.string()
+                        runOnUiThread {
+                            val errorRes= "Error: ${it.code} - ${errorBody ?: "No additional error information"}"
+                            botResponse(errorRes)
+                        }
+                        throw IOException("Unexpected code $response")
+                    }
+
+                    // Parse the JSON response
+                    val responseBody = response.body?.string()
+                    val jsonResponse = JSONObject(responseBody)
+
+                    // Extract the response content from the JSON
+                    val choices = jsonResponse.getJSONArray("choices")
+                    val messageContent = choices.getJSONObject(0)
+                        .getJSONObject("message")
+                        .getString("content")
+
+                    // Update the TextView with the model's response
+                    runOnUiThread {
+                        botResponse(messageContent)
+                    }
+                }
+            }
+
+
+        })
+    }
+
+    private fun openTestFaceDetectionActivity() {
+        // Start your new chat activity or perform your action
+        val intent = Intent(this, TestFaceDetection::class.java)
+        startActivity(intent)
     }
     private fun requestCameraPermission() {
         if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
@@ -263,132 +506,20 @@ class chat_screen: AppCompatActivity() {
         }
     }
 
-    private fun sendMessage() {
-        val message = et_message.text.toString()
-        val timeStamp = Time.timeStamp()
-
-        if (message.isNotEmpty()) {
-            //Adds it to our local list
-            messagesList.add(Message(message, SEND_ID, timeStamp))
-            et_message.setText("")
-
-            adapter.insertMessage(Message(message, SEND_ID, timeStamp))
-            rv_messages.scrollToPosition(adapter.itemCount - 1)
-
-            try {
-                fetchAnswerFromHuggingFace(message)
-            } catch (e: JSONException) {
-                throw RuntimeException(e)
-            }
+    fun startNewSession() {
+        // Create a new session if sessionId is null
+        if (userId != null && chatSessionId == null) {
+            chatSessionId = chatSessionRef.push().key  // Generate a single sessionId
+            chatSessionRef.child(chatSessionId!!).child("emotion").setValue(arrayListOf<String>())
+                .addOnSuccessListener {
+                    Log.d("ChatSession", "New session started with sessionId: $chatSessionId")
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("ChatSession", "Failed to start session: ", exception)
+                }
         }
     }
 
-    private fun botResponse(message: String) {
-        val timeStamp = Time.timeStamp()
-
-        GlobalScope.launch {
-            //Fake response delay
-            delay(1000)
-
-            withContext(Dispatchers.Main) {
-                //Gets the response
-                val response = message
-
-                //Adds it to our local list
-                messagesList.add(Message(response, RECEIVE_ID, timeStamp))
-
-                //Inserts our message into the adapter
-                adapter.insertMessage(Message(response, RECEIVE_ID, timeStamp))
-
-                //Scrolls us to the position of the latest message
-                rv_messages.scrollToPosition(adapter.itemCount - 1)
-
-                //Starts Google
-                when (response) {
-                    OPEN_GOOGLE -> {
-                        val site = Intent(Intent.ACTION_VIEW)
-                        site.data = Uri.parse("https://www.google.com/")
-                        startActivity(site)
-                    }
-                    OPEN_SEARCH -> {
-                        val site = Intent(Intent.ACTION_VIEW)
-                        val searchTerm: String? = message.substringAfterLast("search")
-                        site.data = Uri.parse("https://www.google.com/search?&q=$searchTerm")
-                        startActivity(site)
-                    }
-
-                }
-            }
-        }
-    }
-    private fun fetchAnswerFromHuggingFace(userInput: String) {
-        val apiKey = "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"  // Replace with your API key
-
-        // JSON payload for the request
-        val jsonObject = JSONObject().apply {
-            put("model", "meta-llama/Llama-3.2-1B-Instruct")
-            put("messages", JSONArray().apply {
-                put(JSONObject().apply {
-                    put("role", "user")
-                    put("content", userInput)
-                })
-            })
-            put("max_tokens", 500)
-            put("stream", false)
-        }
-
-        // Build the request
-        val requestBody = RequestBody.create(
-            "application/json; charset=utf-8".toMediaType(),
-            jsonObject.toString()
-        )
-        val request = Request.Builder()
-            .url("https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-1B-Instruct/v1/chat/completions")
-            .addHeader("Authorization", "Bearer $apiKey")
-            .addHeader("Content-Type", "application/json")
-            .post(requestBody)
-            .build()
-
-        // Make the API call
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()  // Handle the error
-                runOnUiThread {
-                    botResponse(e.message.toString())
-                }
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.use {
-                    if (!it.isSuccessful) {
-                        val errorBody = response.body?.string()
-                        runOnUiThread {
-                            val errorRes= "Error: ${it.code} - ${errorBody ?: "No additional error information"}"
-                            botResponse(errorRes)
-                        }
-                        throw IOException("Unexpected code $response")
-                    }
-
-                    // Parse the JSON response
-                    val responseBody = response.body?.string()
-                    val jsonResponse = JSONObject(responseBody)
-
-                    // Extract the response content from the JSON
-                    val choices = jsonResponse.getJSONArray("choices")
-                    val messageContent = choices.getJSONObject(0)
-                        .getJSONObject("message")
-                        .getString("content")
-
-                    // Update the TextView with the model's response
-                    runOnUiThread {
-                        botResponse(messageContent)
-                    }
-                }
-            }
-
-
-        })
-    }
 
     private fun customBotMessage(message: String) {
 

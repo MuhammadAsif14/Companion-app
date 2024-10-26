@@ -7,6 +7,11 @@
         android:title="Home"
         android:icon="@drawable/home_24px"
         />
+    <item
+        android:id="@+id/chat_menu"
+        android:title="Chat menu"
+        android:icon="@drawable/chat_menu"
+        />
 
     <item
         android:id="@+id/profile"

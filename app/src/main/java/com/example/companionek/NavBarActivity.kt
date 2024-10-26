@@ -12,8 +12,12 @@ class NavBarActivity : AppCompatActivity() {
         binding=ActivityNavBarBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Load the default HomeFragment when the activity starts
+        if (savedInstanceState == null) {
+            replaceFragment(HomeFragment())
+        }
 
-        binding.bottomNavigationBar.setOnNavigationItemSelectedListener { item ->
+        binding.bottomNavigationBar.setOnNavigationItemSelectedListener{ item ->
             when(item.itemId) {
                 R.id.home -> {
                     replaceFragment(HomeFragment())
@@ -22,6 +26,10 @@ class NavBarActivity : AppCompatActivity() {
                 R.id.profile -> {
                     replaceFragment(ProfileFragment())
                     true // Indicate that you handled the selection
+                }
+                R.id.chat_menu -> {
+                    replaceFragment(ChatMenuFragment())
+                    true
                 }
                 else -> false
             }

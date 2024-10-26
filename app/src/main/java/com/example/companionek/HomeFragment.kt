@@ -1,17 +1,24 @@
 package com.example.companionek
 
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.companionek.adapter.ChatAdapter
 import com.example.companionek.adapter.DiaryAdapter
 import com.example.companionek.adapter.MoodAdapter
 import com.example.companionek.utils.DiaryItems
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import de.hdodenhof.circleimageview.CircleImageView
 import java.util.Date
 
 class HomeFragment : Fragment() {
@@ -37,6 +44,7 @@ class HomeFragment : Fragment() {
     private lateinit var mDate: Array<String>
     private lateinit var cTitle: Array<String>
     private lateinit var cText: Array<String>
+    private lateinit var profilepic:CircleImageView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -102,9 +110,39 @@ class HomeFragment : Fragment() {
             val intent = Intent(activity, diary_activity::class.java)
             startActivity(intent)
         }
-
+// Fetch and display user data (username and profile picture)
+        loadUserProfile(rootView)
         return rootView
     }
+
+    private fun loadUserProfile(rootView: View) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val userRef = FirebaseDatabase.getInstance().getReference("user").child(userId)
+
+        userRef.get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                val displayName = snapshot.child("userName").value.toString()
+                val profileImageUrl = snapshot.child("profilepic").value
+
+                Log.d(TAG, "loadUserProfile: ${displayName}")
+                Log.d(TAG, "loadUserProfile: ${profileImageUrl}")
+                rootView.findViewById<TextView>(R.id.greeting_text).text ="Hello, "+ displayName
+                val profileImageView = view?.findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.profile_image)
+
+                // Use Glide to load the image URL into the CircleImageView
+                if (profileImageView != null) {
+                    Glide.with(this)
+                        .load(profileImageUrl)
+                        .placeholder(R.drawable.userprofile) // Optional: show a placeholder image while loading
+                        .error(R.drawable.picture)           // Optional: show a fallback image if URL fails to load
+                        .into(profileImageView)
+                }
+            }
+        }.addOnFailureListener {
+            // Handle errors here
+        }
+    }
+
 
     private fun getUserChatData() {
         for (i in cTitle.indices) {

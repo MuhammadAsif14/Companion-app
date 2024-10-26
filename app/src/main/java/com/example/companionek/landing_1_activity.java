@@ -1,18 +1,11 @@
 package com.example.companionek;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -142,7 +135,7 @@ public class landing_1_activity extends AppCompatActivity {
 		cancel_vector.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 
-				Intent intent = new Intent(landing_1_activity.this, HomeActivity.class);
+				Intent intent = new Intent(landing_1_activity.this, NavBarActivity.class);
 				startActivity(intent);
 
 			}

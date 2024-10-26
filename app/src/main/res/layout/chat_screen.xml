@@ -14,7 +14,19 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="#E4E4E4"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
+
+        <ImageView
+            android:id="@+id/cameraVector"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/cameraskyblue"
+            android:layout_margin="10dp"
+            >
+
+        </ImageView>
 
         <EditText
             android:id="@+id/et_message"

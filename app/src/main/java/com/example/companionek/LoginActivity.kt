@@ -26,6 +26,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var signInButton: Button
     private lateinit var auth: FirebaseAuth
+    private var emailPattern = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
 
 
 
@@ -46,10 +47,13 @@ class LoginActivity : AppCompatActivity() {
             val email=emailEditText.text.toString().trim()
             val pass=passwordEditText.text.toString().trim()
             if (email.isEmpty()){
-                emailEditText.setError("Enter Email ")
+                emailEditText.setError("Enter Email")
             }
-            if(pass.isEmpty()){
+            else if(pass.isEmpty()){
                 passwordEditText.setError("Enter the password")
+            }
+            else if (!email.matches(emailPattern.toRegex())) {
+                emailEditText.setError("Please enter a valid email address")
             }
             else{
                 loginUser(email,pass)
@@ -75,15 +79,12 @@ class LoginActivity : AppCompatActivity() {
                         if (user != null) {
                             // Create an Intent to start LandingActivity1
                             val intent = Intent(this@LoginActivity, landing_1_activity::class.java)
-                            // Put user details into the Intent (you can put other details as needed)
-                            intent.putExtra("USERNAME", user.displayName) // Use displayName for username
-                            intent.putExtra("EMAIL", user.email) // Put email as well
+//                            intent.putExtra("USERNAME", user.displayName) // Use displayName for username
+//                            intent.putExtra("EMAIL", user.email) // Put email as well
                             // Start LandingActivity1
                             startActivity(intent)
                             finish() // Optionally finish this activity if you don't want to go back to it
                         }
-
-
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(ContentValues.TAG, "Login:failure", task.exception)
@@ -168,7 +169,6 @@ class LoginActivity : AppCompatActivity() {
 
     fun joinNowListener(view: View) {
         val intent = Intent(this, SignUpActivity::class.java)
-        // Start the activity
         startActivity(intent)
     }
 }

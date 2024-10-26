@@ -5,6 +5,7 @@
             name="MyTheme.Splash"
             parent="Theme.Material3.DayNight.NoActionBar"
             >
+
             <item name="android:windowIsTranslucent">true</item>
             <item name="android:windowBackground">@drawable/gradient_color</item>
             <item name="windowNoTitle">true</item>
@@ -14,3 +15,4 @@
 
         </style>
     </resources>
+    
