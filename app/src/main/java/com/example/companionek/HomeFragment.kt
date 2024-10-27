@@ -19,11 +19,8 @@ import com.example.companionek.adapter.DiaryAdapter
 import com.example.companionek.adapter.MoodAdapter
 import com.example.companionek.utils.DiaryItems
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.Date
 
@@ -109,19 +106,49 @@ class HomeFragment : Fragment() {
         return rootView
     }
 
+//    private fun loadUserProfile(rootView: View) {
+//        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+//        val userRef = FirebaseDatabase.getInstance().getReference("user").child(userId)
+//
+//        userRef.get().addOnSuccessListener { snapshot ->
+//            if (snapshot.exists()) {
+//                val displayName = snapshot.child("userName").value.toString()
+//                val profileImageUrl = snapshot.child("profilepic").value
+//
+//                Log.d(TAG, "loadUserProfile: $displayName")
+//                Log.d(TAG, "loadUserProfile: $profileImageUrl")
+//                rootView.findViewById<TextView>(R.id.greeting_text).text = "Hello, $displayName"
+//                val profileImageView = view?.findViewById<CircleImageView>(R.id.profile_image)
+//
+//                // Use Glide to load the image URL into the CircleImageView
+//                if (profileImageView != null) {
+//                    Glide.with(this)
+//                        .load(profileImageUrl)
+//                        .placeholder(R.drawable.userprofile) // Placeholder image
+//                        .error(R.drawable.picture)           // Fallback image
+//                        .into(profileImageView)
+//                }
+//            }
+//        }.addOnFailureListener {
+//            // Handle errors here
+//        }
+//    }
+
     private fun loadUserProfile(rootView: View) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val userRef = FirebaseDatabase.getInstance().getReference("user").child(userId)
 
-        userRef.get().addOnSuccessListener { snapshot ->
-            if (snapshot.exists()) {
-                val displayName = snapshot.child("userName").value.toString()
-                val profileImageUrl = snapshot.child("profilepic").value
+        // Reference to Firestore
+        val userRef = FirebaseFirestore.getInstance().collection("users").document(userId)
+
+        userRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val displayName = document.getString("userName") ?: ""
+                val profileImageUrl = document.getString("profilepic")
 
                 Log.d(TAG, "loadUserProfile: $displayName")
                 Log.d(TAG, "loadUserProfile: $profileImageUrl")
                 rootView.findViewById<TextView>(R.id.greeting_text).text = "Hello, $displayName"
-                val profileImageView = view?.findViewById<CircleImageView>(R.id.profile_image)
+                val profileImageView = rootView.findViewById<CircleImageView>(R.id.profile_image)
 
                 // Use Glide to load the image URL into the CircleImageView
                 if (profileImageView != null) {
@@ -132,51 +159,97 @@ class HomeFragment : Fragment() {
                         .into(profileImageView)
                 }
             }
-        }.addOnFailureListener {
+        }.addOnFailureListener { exception ->
             // Handle errors here
+            Log.e(TAG, "Error getting user profile: ", exception)
         }
     }
 
-    private fun getUserChatData() {
-        userId?.let { uid ->
-            database = FirebaseDatabase.getInstance().getReference("user").child(uid)
-            database.child("chatSessions").addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    newArrayList2.clear() // Clear previous chat sessions
-                    for (sessionSnapshot in dataSnapshot.children) {
-                        val emotions = sessionSnapshot.child("emotions").children.map { it.getValue(String::class.java) ?: "" }
-                        val sessionId = sessionSnapshot.key ?: "" // Get the session ID
+//
+//    private fun getUserChatData() {
+//        userId?.let { uid ->
+//            database = FirebaseDatabase.getInstance().getReference("user").child(uid)
+//            database.child("chatSessions").addListenerForSingleValueEvent(object : ValueEventListener {
+//                override fun onDataChange(dataSnapshot: DataSnapshot) {
+//                    newArrayList2.clear() // Clear previous chat sessions
+//                    for (sessionSnapshot in dataSnapshot.children) {
+//                        val emotions = sessionSnapshot.child("emotions").children.map { it.getValue(String::class.java) ?: "" }
+//                        val sessionId = sessionSnapshot.key ?: "" // Get the session ID
+//
+//                        // Create a ChatItems instance for this chat session
+//                        val chatItem = ChatItems(
+//                            image = R.drawable.happy_emoji, // Use a placeholder image
+//                            chatTitle = emotions.joinToString(", "), // Combine emotions
+//                            text = "Chat session with ${emotions.joinToString(", ")} emotions.",
+//                            sessionId = sessionId // Pass the session ID here
+//                        )
+//                        newArrayList2.add(chatItem) // Add the session item to the list
+//                    }
+//
+//                    // Set the adapter with the updated data
+//                    newRecyclerView2.adapter = ChatAdapter(newArrayList2) { sessionId ->
+//                        onChatItemClick(sessionId)
+//                    }
+//                }
+//
+//                override fun onCancelled(databaseError: DatabaseError) {
+//                    Log.e("HomeFragment", "Error retrieving chat data: ${databaseError.message}")
+//                }
+//            })
+//        }
+//    }
+//
+//    private fun onChatItemClick(sessionId: String) {
+//        // Start the chat screen activity and pass the session ID
+//        val intent = Intent(activity, chat_screen::class.java)
+//        intent.putExtra("SESSION_ID", sessionId) // Pass the session ID
+//        startActivity(intent)
+//    }
+private fun getUserChatData() {
+    userId?.let { uid ->
+        // Reference to user's chatSessions collection in Firestore
+        val chatSessionsRef = FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .collection("chatSessions")
 
-                        // Create a ChatItems instance for this chat session
-                        val chatItem = ChatItems(
-                            image = R.drawable.happy_emoji, // Use a placeholder image
-                            chatTitle = emotions.joinToString(", "), // Combine emotions
-                            text = "Chat session with ${emotions.joinToString(", ")} emotions.",
-                            sessionId = sessionId // Pass the session ID here
-                        )
-                        newArrayList2.add(chatItem) // Add the session item to the list
-                    }
+        chatSessionsRef.get()
+            .addOnSuccessListener { sessionsSnapshot ->
+                newArrayList2.clear() // Clear the list before adding new data
 
-                    // Set the adapter with the updated data
-                    newRecyclerView2.adapter = ChatAdapter(newArrayList2) { sessionId ->
-                        onChatItemClick(sessionId)
-                    }
+                for (sessionSnapshot in sessionsSnapshot.documents) {
+                    // Retrieve session ID
+                    val sessionId = sessionSnapshot.id
+                    // Retrieve emotions array from the session document
+                    val emotions = sessionSnapshot.get("emotions") as? List<String> ?: emptyList()
+
+                    // Create a ChatItems instance for this chat session
+                    val chatItem = ChatItems(
+                        image = R.drawable.happy_emoji, // Choose an appropriate image
+                        chatTitle = emotions.joinToString(", "),
+                        text = "Chat session with ${emotions.joinToString(", ")} emotions.",
+                        sessionId = sessionId // Pass the session ID here
+                    )
+                    newArrayList2.add(chatItem) // Add the session item to the list
                 }
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.e("HomeFragment", "Error retrieving chat data: ${databaseError.message}")
-                }
-            })
-        }
+                // Notify the adapter of the data change
+                newRecyclerView2.adapter = ChatAdapter(newArrayList2, ::onChatItemClick)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("ChatMenuFragment", "Error retrieving chat data: ${exception.message}", exception)
+            }
     }
+}
 
+    // Called when a chat item is clicked
     private fun onChatItemClick(sessionId: String) {
         // Start the chat screen activity and pass the session ID
-        val intent = Intent(activity, chat_screen::class.java)
+        val intent = Intent(requireContext(), chat_screen::class.java)
         intent.putExtra("SESSION_ID", sessionId) // Pass the session ID
+        intent.putExtra("isSessionCreated",true)
         startActivity(intent)
     }
-
 //    private fun getUserWeekData() {
 //        for (i in wTitle.indices) {
 //            val mood = MoodItems(wImageId[i], wTitle[i], wDay[i], wDate[i])
