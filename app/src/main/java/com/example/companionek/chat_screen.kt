@@ -33,13 +33,11 @@ import com.example.companionek.utils.Constants.RECEIVE_ID
 import com.example.companionek.utils.Constants.SEND_ID
 import com.example.companionek.utils.Time
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.GenericTypeIndicator
-import com.google.firebase.database.MutableData
-import com.google.firebase.database.Transaction
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
@@ -82,15 +80,21 @@ class chat_screen: AppCompatActivity() {
     private lateinit var adapter: MessagingAdapter
     private lateinit var btn_send: Button
     private lateinit var cameraVector: ImageView
+//
+//    private lateinit var chatSessionRef: DatabaseReference
+    private lateinit var chatSessionRef: DocumentReference
 
-    private lateinit var chatSessionRef: DatabaseReference
     private lateinit var database:FirebaseDatabase
-    private var userId: String? = null
+    private val firestore = FirebaseFirestore.getInstance()
+
+    private var  userId = FirebaseAuth.getInstance().currentUser?.uid
+    private var isSessionCreated = false // Flag to track if session is created
+
     private var chatSessionId: String? = null
 
 
 
-    private val botList = listOf("M.A.M", "Ayesha", "Nizam", "Asif")
+    private val botList = listOf( "Ayesha", "Nizam", "Asif")
 
     private val client = OkHttpClient()
 
@@ -116,45 +120,21 @@ class chat_screen: AppCompatActivity() {
             }
 
         }
-        database = FirebaseDatabase.getInstance()
-        userId = FirebaseAuth.getInstance().currentUser?.uid
-
-        // Initialize session ID and session reference
-        if (userId != null) {
-            // Check if the chatSessionId already exists before generating a new one
-            if (chatSessionId == null) {
-                chatSessionId = database.getReference("user/$userId/chatSessions").push().key
-                chatSessionRef = database.getReference("user/$userId/chatSessions/$chatSessionId")
-
-                Toast.makeText(this, "chatSessionID: $chatSessionId", Toast.LENGTH_LONG).show()
-                // Assume userId and sessionId are already defined
-                val emotionsList = listOf( "sad","happy", "neutral")
-
-                // Save emotions to the session
-                chatSessionRef.child("emotions").setValue(emotionsList)
-                    .addOnSuccessListener {
-                        Log.d("Emotion", "Emotions saved successfully")
-                    }
-                    .addOnFailureListener { exception ->
-                        Log.e("Emotion", "Failed to save emotions: ", exception)
-                    }
-
-            }
 
 
+        chatSessionId = intent.getStringExtra("SESSION_ID") ?: null
+        isSessionCreated = intent.getBooleanExtra("isSessionCreated", false)
+        // Load previous messages if session is already created
+        if (isSessionCreated && chatSessionId!!.isNotEmpty()) {
+            Log.e("chatSessionID", "Chat session ID:$chatSessionId")
 
-            Toast.makeText(this, "chatSessionID:${chatSessionId}", Toast.LENGTH_LONG).show()
+            Log.e("Loading ", "Chat session ID:$chatSessionId")
 
-        }else{
-            Toast.makeText(this, "user id from database is null", Toast.LENGTH_LONG).show()
-
+            loadPreviousMessages()
         }
 
         requestCameraPermission()
-        // Request camera permission
-
         recyclerView()
-
         clickEvents()
 
         val random = (0..3).random()
@@ -166,14 +146,89 @@ class chat_screen: AppCompatActivity() {
         }
     }
 
+private fun loadPreviousMessages() {
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+    // Ensure chatSessionId is available
+    if (chatSessionId == null) {
+        Log.e("chat_screen", "Chat session ID is null")
+        return
+    }
+
+    // Reference to the chat session's messages collection in Firestore
+    chatSessionRef = firestore.collection("users")
+        .document(userId)
+        .collection("chatSessions")
+        .document(chatSessionId!!)
+
+    Log.e("ChatSessionRef ", "ChatSessionRef:$chatSessionRef")
+
+    // Get the messages for this session
+    chatSessionRef.collection("messages")
+        .orderBy("timestamp") // Ensure messages are ordered by timestamp
+        .get()
+        .addOnSuccessListener { querySnapshot ->
+            if (querySnapshot.isEmpty) {
+                Log.e("chat_screen", "No messages found in this session.")
+                return@addOnSuccessListener
+            }
+            // Create a list of messages
+            val loadedMessages = mutableListOf<Message>()
+            querySnapshot.documents.forEach { document ->
+                val messageText = document.getString("message") ?: ""
+                Log.e("MessageText ", "$messageText")
+
+                val senderId = document.getString("sender") ?: ""
+
+                Log.e("Sender ", ":$senderId")
+
+                val timestamp = document.getLong("timestamp") ?: System.currentTimeMillis()
+                Log.e("Timestamp ", ":$timestamp")
+
+                // Convert timestamp to the desired time format
+                val formattedTime = Time.convertTimestampToTime(timestamp)
+                if(senderId.equals("user")) {
+                    // Create Message object and add to messages list
+                    val message = Message(messageText.toString(), SEND_ID, formattedTime)
+                    loadedMessages.add(message)
+                }else if(senderId.equals("bot")){
+                    // Create Message object and add to messages list
+                    val message = Message(messageText.toString(), RECEIVE_ID, formattedTime)
+                    loadedMessages.add(message)
+
+                }
+            }
+            displayMessagesOneByOne(loadedMessages)
+
+
+        }
+        .addOnFailureListener { exception ->
+            Log.e("chat_screen", "Failed to load messages: ", exception)
+        }
+}
+    private fun displayMessagesOneByOne(messages: List<Message>) {
+        val sortedMessages = messages.sortedBy { Time.parseTimeToMillis(it.time) }
+        GlobalScope.launch(Dispatchers.Main) {
+            for (message in sortedMessages) {
+                // Add the message to the list and notify the adapter
+                messagesList.add(message)
+                adapter.insertMessage(message) // Notify adapter about new item
+                Log.d("messageTag", "${message.message}")
+
+                rv_messages.scrollToPosition(adapter.itemCount - 1) // Scroll to the latest message
+                delay(100) // Wait for 500 milliseconds before displaying the next message
+
+            }
+        }
+    }
+
+
+
 
 
     private fun sendMessage() {
         val message = et_message.text.toString()
         val timeStamp = Time.timeStamp()
-
-
-
         if (message.isNotEmpty()) {
             //Adds it to our local list
             messagesList.add(Message(message, SEND_ID, timeStamp))
@@ -191,56 +246,61 @@ class chat_screen: AppCompatActivity() {
         }
     }
 
-    // Function to save chat messages under the current session
     fun saveChatMessage(messageText: String, sender: String) {
         if (userId != null && chatSessionId != null) {
-            val chatId = chatSessionRef.push().key // Generate a unique chat ID
-            if (chatId != null) {
-                val chatMessage = ChatMessage(
-                    message = messageText,
-                    timestamp = System.currentTimeMillis(),
-                    sender = sender
-                )
+            // Generate a unique document ID for the message
+            val chatId = FirebaseFirestore.getInstance()
+                .collection("users").document(userId!!)
+                .collection("chatSessions").document(chatSessionId!!)
+                .collection("messages").document().id
 
-                // Save message under the specific session ID and chat ID
-                chatSessionRef.child("$chatId").setValue(chatMessage)
-                    .addOnSuccessListener {
-                        Log.d("ChatMessage", "Message saved to Firebase: $messageText")
-                    }
-                    .addOnFailureListener { exception ->
-                        Log.e("ChatMessage", "Failed to save message: ", exception)
-                    }
+            val chatMessage = ChatMessage(
+                message = messageText,
+                timestamp = System.currentTimeMillis(),
+                sender = sender
+            )
+            val newEmotion = "sad"
+            addEmotionToSession(userId!!, chatSessionId!!, newEmotion)
+
+            // Reference to the specific message document in Firestore
+            val messageRef = FirebaseFirestore.getInstance()
+                .collection("users").document(userId!!)
+                .collection("chatSessions").document(chatSessionId!!)
+                .collection("messages").document(chatId)
+
+
+            // Save message to Firestore
+            messageRef.set(chatMessage)
+                .addOnSuccessListener {
+                    Log.d("ChatMessage", "Message saved to Firestore: $messageText")
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("ChatMessage", "Failed to save message to Firestore", exception)
+                }
+        }
+    }
+
+
+    //to update the emotion of the user for each session
+
+    fun addEmotionToSession(userId: String, sessionId: String, emotion: String) {
+        // Reference to the specific chat session document
+        val sessionRef = FirebaseFirestore.getInstance().collection("users").document(userId)
+            .collection("chatSessions").document(sessionId)
+
+        // Use a map to add or update the `emotions` array
+        val updateData = mapOf("emotions" to FieldValue.arrayUnion(emotion))
+
+        // Set the data to merge the `emotions` field without overwriting other data
+        sessionRef.set(updateData, SetOptions.merge())
+            .addOnSuccessListener {
+                Log.d("FirestoreHelper", "Emotion added successfully to session $sessionId.")
             }
-        }
+            .addOnFailureListener { e ->
+                Log.e("FirestoreHelper", "Error adding emotion: ", e)
+            }
     }
 
-    //to update the emotion of the user for each seesion
-    fun addEmotionToSession(emotion: String) {
-        if (userId != null && chatSessionId != null) {
-            // Reference the emotion list in the session node
-            val emotionListRef = chatSessionRef.child("$chatSessionId/emotion")
-
-            // Use a transaction to safely add the new emotion to the list to update use following code
-//            val detectedEmotion = "happy" // Example emotion detected
-//            addEmotionToSession(detectedEmotion)
-            emotionListRef.runTransaction(object : Transaction.Handler {
-                override fun doTransaction(currentData: MutableData): Transaction.Result {
-                    val currentList = currentData.getValue(object : GenericTypeIndicator<MutableList<String>>() {}) ?: mutableListOf()
-                    currentList.add(emotion)
-                    currentData.value = currentList
-                    return Transaction.success(currentData)
-                }
-
-                override fun onComplete(error: DatabaseError?, committed: Boolean, currentData: DataSnapshot?) {
-                    if (error != null) {
-                        Log.e("ChatSession", "Failed to update emotion list: ", error.toException())
-                    } else {
-                        Log.d("ChatSession", "Emotion added to session: $emotion")
-                    }
-                }
-            })
-        }
-    }
 
 
 
@@ -354,6 +414,100 @@ class chat_screen: AppCompatActivity() {
 
         })
     }
+
+
+
+    private fun clickEvents() {
+
+        //Send a message
+        btn_send.setOnClickListener {
+            if (!isSessionCreated) {
+                createChatSession()
+            }
+            sendMessage()
+        }
+
+        //Scroll back to correct position when user clicks on text view
+        et_message.setOnClickListener {
+            GlobalScope.launch {
+                delay(100)
+
+                withContext(Dispatchers.Main) {
+                    rv_messages.scrollToPosition(adapter.itemCount - 1)
+
+                }
+            }
+        }
+    }
+    private fun createChatSession() {
+        userId = FirebaseAuth.getInstance().currentUser?.uid
+        Log.d("Checking", ": $chatSessionId")
+
+        Log.d("Checking userid", ": $userId")
+
+        if (userId != null && chatSessionId == null) {
+            chatSessionId = firestore.collection("users")
+                .document(userId!!)
+                .collection("chatSessions")
+                .document().id
+
+            chatSessionRef = firestore.collection("users")
+                .document(userId!!)
+                .collection("chatSessions")
+                .document(chatSessionId!!)
+
+            Toast.makeText(this, "chatSessionID: $chatSessionId", Toast.LENGTH_LONG).show()
+            Log.d("CREATING SESSION WITH FIREBASE", "FIREBASE SESSIONID: $chatSessionId")
+
+            // Example list of emotions (can be updated during conversation as needed)
+            val emotionsList = listOf("sad", "happy", "neutral")
+
+            // Save initial emotions to the session
+            chatSessionRef.set(hashMapOf("emotions" to emotionsList))
+                .addOnSuccessListener {
+                    Log.d("Emotion", "Emotions saved successfully")
+                    isSessionCreated = true // Update flag to prevent multiple sessions
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Emotion", "Failed to save emotions: ", exception)
+                }
+        } else {
+            Toast.makeText(this, "User ID is null or session already created", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun recyclerView() {
+        adapter = MessagingAdapter()
+        rv_messages.adapter = adapter
+        rv_messages.layoutManager = LinearLayoutManager(applicationContext)
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        //In case there are messages, scroll to bottom when re-opening app
+        GlobalScope.launch {
+            delay(100)
+            withContext(Dispatchers.Main) {
+                rv_messages.scrollToPosition(adapter.itemCount - 1)
+            }
+        }
+    }
+    private fun customBotMessage(message: String) {
+        GlobalScope.launch {
+            delay(1000)
+            withContext(Dispatchers.Main) {
+                val timeStamp = Time.timeStamp()
+
+                messagesList.add(Message(message, RECEIVE_ID, timeStamp))
+                adapter.insertMessage(Message(message, RECEIVE_ID, timeStamp))
+
+                rv_messages.scrollToPosition(adapter.itemCount - 1)
+            }
+        }
+    }
+
+
 
     private fun openTestFaceDetectionActivity() {
         // Start your new chat activity or perform your action
@@ -480,70 +634,6 @@ class chat_screen: AppCompatActivity() {
 
 
 
-    private fun clickEvents() {
-
-        //Send a message
-        btn_send.setOnClickListener {
-            sendMessage()
-        }
-
-        //Scroll back to correct position when user clicks on text view
-        et_message.setOnClickListener {
-            GlobalScope.launch {
-                delay(100)
-
-                withContext(Dispatchers.Main) {
-                    rv_messages.scrollToPosition(adapter.itemCount - 1)
-
-                }
-            }
-        }
-    }
-
-    private fun recyclerView() {
-        adapter = MessagingAdapter()
-        rv_messages.adapter = adapter
-        rv_messages.layoutManager = LinearLayoutManager(applicationContext)
-
-    }
-
-    override fun onStart() {
-        super.onStart()
-        //In case there are messages, scroll to bottom when re-opening app
-        GlobalScope.launch {
-            delay(100)
-            withContext(Dispatchers.Main) {
-                rv_messages.scrollToPosition(adapter.itemCount - 1)
-            }
-        }
-    }
-
-    fun startNewSession() {
-        // Create a new session if sessionId is null
-        if (userId != null && chatSessionId == null) {
-            chatSessionId = chatSessionRef.push().key  // Generate a single sessionId
-            chatSessionRef.child(chatSessionId!!).child("emotion").setValue(arrayListOf<String>())
-                .addOnSuccessListener {
-                    Log.d("ChatSession", "New session started with sessionId: $chatSessionId")
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("ChatSession", "Failed to start session: ", exception)
-                }
-        }
-    }
 
 
-    private fun customBotMessage(message: String) {
-
-        GlobalScope.launch {
-            delay(1000)
-            withContext(Dispatchers.Main) {
-                val timeStamp = Time.timeStamp()
-                messagesList.add(Message(message, RECEIVE_ID, timeStamp))
-                adapter.insertMessage(Message(message, RECEIVE_ID, timeStamp))
-
-                rv_messages.scrollToPosition(adapter.itemCount - 1)
-            }
-        }
-    }
 }

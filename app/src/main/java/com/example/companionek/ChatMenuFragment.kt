@@ -13,11 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.companionek.adapter.ChatAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FirebaseFirestore
 
 class ChatMenuFragment : Fragment() {
     private lateinit var newRecyclerView2: RecyclerView
@@ -68,44 +66,24 @@ class ChatMenuFragment : Fragment() {
         val intent = Intent(requireContext(), chat_screen::class.java)
         startActivity(intent)
     }
-//    private fun getUserChatData() {
-//    userId?.let { uid ->
-//        // Retrieve chat sessions for the user
-//        database.child("user").child(uid).child("chatSessions").addListenerForSingleValueEvent(object : ValueEventListener {
-//            override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                newArrayList2.clear() // Clear the list before adding new data
-//                for (sessionSnapshot in dataSnapshot.children) {
-//                    // Retrieve emotions for the current session
-//                    val emotions = sessionSnapshot.child("emotions").children.map { it.getValue(String::class.java) ?: "" }
-//
-//                    // Create a ChatItems instance for this chat session
-//                    val chatItem = ChatItems(
-//                        image = R.drawable.happy_emoji, // Choose an appropriate image based on your logic
-//                        chatTitle = emotions.joinToString(", "), // Combine emotions into a single string
-//                        text = "Chat session with ${emotions.joinToString(", ")} emotions." // Provide a description or summary of the session
-//                    )
-//                    newArrayList2.add(chatItem) // Add the session item to the list
-//                }
-//
-//                // Notify the adapter of the data change
-//                newRecyclerView2.adapter = ChatAdapter(newArrayList2)
-//            }
-//
-//            override fun onCancelled(databaseError: DatabaseError) {
-//                Log.e("ChatMenuFragment", "Error retrieving chat data: ${databaseError.message}")
-//            }
-//        })
-//    }
-//}
+
 private fun getUserChatData() {
     userId?.let { uid ->
-        // Retrieve chat sessions for the user
-        database.child("user").child(uid).child("chatSessions").addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
+        // Reference to user's chatSessions collection in Firestore
+        val chatSessionsRef = FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .collection("chatSessions")
+
+        chatSessionsRef.get()
+            .addOnSuccessListener { sessionsSnapshot ->
                 newArrayList2.clear() // Clear the list before adding new data
-                for (sessionSnapshot in dataSnapshot.children) {
-                    val emotions = sessionSnapshot.child("emotion").children.map { it.getValue(String::class.java) ?: "" }
-                    val sessionId = sessionSnapshot.key ?: "" // Get the session ID
+
+                for (sessionSnapshot in sessionsSnapshot.documents) {
+                    // Retrieve session ID
+                    val sessionId = sessionSnapshot.id
+                    // Retrieve emotions array from the session document
+                    val emotions = sessionSnapshot.get("emotions") as? List<String> ?: emptyList()
 
                     // Create a ChatItems instance for this chat session
                     val chatItem = ChatItems(
@@ -120,18 +98,20 @@ private fun getUserChatData() {
                 // Notify the adapter of the data change
                 newRecyclerView2.adapter = ChatAdapter(newArrayList2, ::onChatItemClick)
             }
-            private fun onChatItemClick(sessionId: String) {
-                // Start the chat screen activity and pass the session ID
-                val intent = Intent(requireContext(), chat_screen::class.java)
-                intent.putExtra("SESSION_ID", sessionId) // Pass the session ID
-                startActivity(intent)
+            .addOnFailureListener { exception ->
+                Log.e("ChatMenuFragment", "Error retrieving chat data: ${exception.message}", exception)
             }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.e("ChatMenuFragment", "Error retrieving chat data: ${databaseError.message}")
-            }
-        })
     }
 }
+
+    // Called when a chat item is clicked
+    private fun onChatItemClick(sessionId: String) {
+        // Start the chat screen activity and pass the session ID
+        val intent = Intent(requireContext(), chat_screen::class.java)
+        intent.putExtra("SESSION_ID", sessionId) // Pass the session ID
+        intent.putExtra("isSessionCreated",true)
+        startActivity(intent)
+    }
+
 
 }

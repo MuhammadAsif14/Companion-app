@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.annotation.Nullable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.companionek.utils.FirestoreHelper
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -135,128 +136,122 @@ class SignUpActivity : AppCompatActivity() {
         startActivity(intent)
 
     }
-//    private fun registerUser(email: String, password: String, newDisplayName: String) {
-//        MainScope().launch {
-//            try {
-//                auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this@SignUpActivity){task ->
-//                    if (task.isSuccessful) {
-//                        val id = task.result?.user?.uid ?: ""
-//                         databaseReference = database.reference.child("user").child(id)
-//                         storageReference = storage.reference.child("Upload").child(id)
+//private fun registerUser(email: String, password: String, newDisplayName: String) {
+//    lifecycleScope.launch {
 //
-//                        if (imageURI != null) {
-//                            storageReference.putFile(imageURI)
-//                                .addOnCompleteListener { task ->
-//                                    if (task.isSuccessful) {
-//                                        storageReference.downloadUrl
-//                                            .addOnSuccessListener { uri ->
-//                                                val imageUri = uri.toString()
-//                                                val users = Users(id, newDisplayName, email, password, imageUri)
-//                                                databaseReference.setValue(users)
-//                                                    .addOnCompleteListener { task ->
-//                                                        if (task.isSuccessful) {
-//                                                            val intent = Intent(this@SignUpActivity, landing_1_activity::class.java)
-//                                                            startActivity(intent)
-//                                                            finish()
-//                                                        } else {
-//                                                            Toast.makeText(this@SignUpActivity, "Error in creating the user", Toast.LENGTH_SHORT).show()
-//                                                        }
-//                                                    }
-//                                            }
+//        try {
+//            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this@SignUpActivity) { task ->
+//                if (task.isSuccessful) {
+//                     id = task.result?.user?.uid ?: ""
+//                    storageReference = storage.reference.child("Upload").child(id)
+//
+//                    if (imageURI != null) {
+//                        storageReference.putFile(imageURI)
+//                            .addOnSuccessListener {
+//                                storageReference.downloadUrl.addOnSuccessListener { uri ->
+//                                    val imageUri = uri.toString()
+//                                    callAddUser(imageUri, id) { isSuccess ->
+//                                        if (isSuccess) {
+//                                            Log.d(TAG, "User added successfully.")
+//                                            val intent = Intent(this@SignUpActivity, landing_1_activity::class.java)
+//                                            startActivity(intent)
+//                                            finish()
+//                                        } else {
+//                                            Log.d(TAG, "Failed to add user.")
+//                                            Toast.makeText(this@SignUpActivity, "Error adding user data", Toast.LENGTH_SHORT).show()
+//
+//                                        }
 //                                    }
+//
+//
+//
 //                                }
-//                        }
-//                         // Sign in success, update UI with the signed-in user's information
-//                        Log.d(TAG, "createUserWithEmail:success")
-//                        Toast.makeText(baseContext,"UserCreated Successfully.",Toast.LENGTH_SHORT).show()
-////                        val user = auth.currentUser
-////                        val profileUpdates = userProfileChangeRequest {
-////                            displayName = newDisplayName // Set the display name
-////                        }
-////                        user?.updateProfile(profileUpdates)?.addOnCompleteListener { profileTask ->
-////                            if (profileTask.isSuccessful) {
-////                                Log.d(TAG, "User profile updated.")
-////                                // Optionally, navigate to the next activity
-////                                 val intent = Intent(this@SignUpActivity, landing_1_activity::class.java)
-////                                 startActivity(intent)
-////                                 finish()
-////
-////                            }
-////                        }
+//                            }
 //
 //                    } else {
-//                        // If sign in fails, display a message to the user.
-//                        Log.w(TAG, "createUserWithEmail:failure", task.exception)
-//                        Toast.makeText(
-//                            baseContext,
-//                            "Authentication failed         vv                       bbbb.",
-//                            Toast.LENGTH_SHORT,
-//                        ).show()
+//                        Toast.makeText(this@SignUpActivity, "User did not select profile pic saving default pic", Toast.LENGTH_SHORT).show()
+//                            imageURI = Uri.parse("https://firebasestorage.googleapis.com/v0/b/companion-11996.appspot.com/o/man.png?alt=media&token=10104ab8-f99e-4447-bbb0-5c8ff35115b8")
+//                            profilePic.setImageURI(imageURI)
+//                            callAddUser(imageURI.toString(), id) { isSuccess ->
+//                            if (isSuccess) {
+//                                Log.d(TAG, "User added successfully.")
+//                                val intent = Intent(this@SignUpActivity, landing_1_activity::class.java)
+//                                startActivity(intent)
+//                                finish()
+//                            } else {
+//                                Log.d(TAG, "Failed to add user.")
+//                                Toast.makeText(this@SignUpActivity, "Error adding user data", Toast.LENGTH_SHORT).show()
+//
+//                            }
+//                        }
+//
+//
 //
 //                    }
+//                    Toast.makeText(baseContext, "Launch landing_1_activity regardless of image upload/database completion", Toast.LENGTH_SHORT).show()
+//                    // Launch landing_1_activity regardless of image upload/database completion
+//                    val intent = Intent(this@SignUpActivity, landing_1_activity::class.java)
+//                    startActivity(intent)
+//                    finish()
+//                } else {
+//                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
+//                    Toast.makeText(baseContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
 //                }
-//
-//                // Proceed to next activity or perform other actions with the user
-//            } catch (e: Exception) {
-//                Toast.makeText(this@SignUpActivity, "Registration failed: ${e.message}", Toast.LENGTH_LONG).show()
-//                println(e.message)
 //            }
+//        } catch (e: Exception) {
+//            Toast.makeText(this@SignUpActivity, "Registration failed: ${e.message}", Toast.LENGTH_LONG).show()
+//            println(e.message)
 //        }
 //    }
+//}
 private fun registerUser(email: String, password: String, newDisplayName: String) {
     lifecycleScope.launch {
         try {
-            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this@SignUpActivity) { task ->
+            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val id = task.result?.user?.uid ?: ""
-                    databaseReference = database.reference.child("user").child(id)
                     storageReference = storage.reference.child("Upload").child(id)
 
+                    // Image Upload Logic
                     if (imageURI != null) {
                         storageReference.putFile(imageURI)
                             .addOnSuccessListener {
                                 storageReference.downloadUrl.addOnSuccessListener { uri ->
                                     val imageUri = uri.toString()
-                                    val users = Users(id, newDisplayName, email, password, imageUri)
-                                    databaseReference.setValue(users).addOnCompleteListener { dbTask ->
-                                        if (dbTask.isSuccessful) {
-                                            Log.d(TAG, "User data added to database successfully.")
+                                    callAddUser(imageUri, id) { isSuccess ->
+                                        if (isSuccess) {
+                                            Log.d(TAG, "User added successfully.")
+                                            launchLandingActivity()
                                         } else {
+                                            Log.d(TAG, "Failed to add user.")
                                             Toast.makeText(this@SignUpActivity, "Error adding user data", Toast.LENGTH_SHORT).show()
                                         }
                                     }
                                 }
+                            }.addOnFailureListener { e ->
+                                Log.e(TAG, "Image upload failed: ${e.message}")
+                                Toast.makeText(this@SignUpActivity, "Image upload failed: ${e.message}", Toast.LENGTH_SHORT).show()
                             }
+
                     } else {
-                        Toast.makeText(this@SignUpActivity, "User did not select profile pic saving default pic", Toast.LENGTH_SHORT).show()
-                            imageURI = Uri.parse("https://firebasestorage.googleapis.com/v0/b/companion-11996.appspot.com/o/man.png?alt=media&token=10104ab8-f99e-4447-bbb0-5c8ff35115b8")
-                            profilePic.setImageURI(imageURI)
-                            val users = Users(id, displayName, email, password, imageURI.toString())
-                            databaseReference.setValue(users)
-                                .addOnCompleteListener { task ->
-                                    if (task.isSuccessful) {
-                                        val intent = Intent(this@SignUpActivity, landing_1_activity::class.java)
-                                        startActivity(intent)
-                                        finish()
-                                    } else {
-                                        Toast.makeText(this@SignUpActivity, "Error in creating the user", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-
-
+                        Toast.makeText(this@SignUpActivity, "User did not select profile pic, saving default pic", Toast.LENGTH_SHORT).show()
+                        callAddUser("https://firebasestorage.googleapis.com/v0/b/companion-11996.appspot.com/o/man.png?alt=media&token=10104ab8-f99e-4447-bbb0-5c8ff35115b8", id) { isSuccess ->
+                            if (isSuccess) {
+                                Log.d(TAG, "User added successfully.")
+                                launchLandingActivity()
+                            } else {
+                                Log.d(TAG, "Failed to add user.")
+                                Toast.makeText(this@SignUpActivity, "Error adding user data", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
-
-                    // Launch landing_1_activity regardless of image upload/database completion
-                    val intent = Intent(this@SignUpActivity, landing_1_activity::class.java)
-                    startActivity(intent)
-                    finish()
-
-                    Log.d(TAG, "createUserWithEmail:success")
-                    Toast.makeText(baseContext, "User Created Successfully.", Toast.LENGTH_SHORT).show()
                 } else {
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     Toast.makeText(baseContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
                 }
+            }.addOnFailureListener { e ->
+                Log.e(TAG, "Authentication failed: ${e.message}")
+                Toast.makeText(baseContext, "Authentication failed: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
             Toast.makeText(this@SignUpActivity, "Registration failed: ${e.message}", Toast.LENGTH_LONG).show()
@@ -264,6 +259,31 @@ private fun registerUser(email: String, password: String, newDisplayName: String
         }
     }
 }
+
+    // Helper function to launch the landing activity
+    private fun launchLandingActivity() {
+        val intent = Intent(this@SignUpActivity, landing_1_activity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun callAddUser(imageURI: String, userId: String, callback: (Boolean) -> Unit) {
+        lifecycleScope.launch {  // Launch a coroutine
+            val firestoreHelperobj = FirestoreHelper()
+            try {
+                // Save user data to Firestore and get the success status
+                val isSuccess = firestoreHelperobj.addUser(displayName, imageURI.toString(), email, password, userId)
+                Log.d(TAG, "User added successfully with ID: $userId")
+                callback(isSuccess) // Notify the caller about success/failure
+            } catch (e: Exception) {
+                Log.e(TAG, "Error adding user: ${e.message}", e)
+                Toast.makeText(this@SignUpActivity, "Error adding user: ${e.message}", Toast.LENGTH_SHORT).show()
+                callback(false) // Notify failure
+            }
+        }
+    }
+
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
