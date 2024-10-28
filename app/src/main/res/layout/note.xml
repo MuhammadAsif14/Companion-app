@@ -9,8 +9,13 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#898E42"
-        app:cardCornerRadius="200dp">
+        android:backgroundTint="#212121"
+        app:cardCornerRadius="10dp"
+        android:layout_margin="2dp"
+
+
+
+        >
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -26,7 +31,10 @@
                 android:paddingTop="2dp"
                 android:text="first Day at Uni.."
                 android:textAlignment="viewStart"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:textSize="16sp"
                 />
 
@@ -38,7 +46,7 @@
                 android:text="Will head too the note.."
                 android:paddingTop="2dp"
                 android:paddingBottom="2dp"
-                android:textColor="@color/white"
+                android:textColor="#757575"
                 android:textSize="14sp"
                 android:layout_marginStart="18dp">
 
@@ -50,7 +58,9 @@
                 android:id="@+id/date"
                 android:layout_alignParentEnd="true"
                 android:text="07/05/2024"
+                android:textColor="@color/white"
                 android:paddingEnd="12dp"
+                android:layout_marginTop="2dp"
                 >
 
             </TextView>

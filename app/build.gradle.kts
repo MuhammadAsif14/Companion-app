@@ -18,6 +18,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {
+        dataBinding = true
         viewBinding = true
     }
 
@@ -51,7 +52,6 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.3")
 
     // RecyclerView dependency
     implementation("androidx.recyclerview:recyclerview:1.3.2")
@@ -84,7 +84,6 @@ dependencies {
     // CameraSource
     implementation("com.google.android.gms:play-services-vision-common:19.1.3")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
 
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.5.0"))
@@ -93,7 +92,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-database")
-    implementation ("com.google.firebase:firebase-firestore-ktx:24.0.0")
+    implementation ("com.google.firebase:firebase-firestore-ktx:25.1.1")
 
 
     // Material Calendar View
@@ -101,11 +100,19 @@ dependencies {
     implementation("com.jakewharton.threetenabp:threetenabp:1.3.1")
 
     implementation("com.android.volley:volley:1.2.1")
-    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation ("de.hdodenhof:circleimageview:3.1.0")
     //glide for smooth image loading
     implementation ("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
+
+    //Navigation, lifecycle
+    implementation ("androidx.navigation:navigation-fragment:2.8.3")
+    implementation ("androidx.navigation:navigation-ui:2.8.3")
+    implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
+    implementation ("androidx.navigation:navigation-ui-ktx:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.3")
 
 
 

@@ -8,6 +8,11 @@
         android:icon="@drawable/home_24px"
         />
     <item
+        android:id="@+id/diary_menu"
+        android:title="Diary"
+        android:icon="@drawable/diary_menu_png"
+        />
+    <item
         android:id="@+id/chat_menu"
         android:title="Chat menu"
         android:icon="@drawable/chat_menu"

@@ -1,79 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/diary_container"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent">
+	android:layout_height="match_parent"
+	android:background="#212121">
 
+	<!-- Back Button -->
 	<ImageView
-		android:id="@+id/back_vector"
-		android:layout_width="24dp"
-		android:layout_height="24dp"
+		android:id="@+id/backButton"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentStart="true"
 		android:layout_marginStart="16dp"
 		android:layout_marginTop="16dp"
-		android:src="@drawable/back_vector"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent" />
-
-	<LinearLayout
-		android:layout_marginTop="20dp"
-		android:id="@+id/linearLayout"
-		android:layout_width="match_parent"
+		android:layout_marginEnd="16dp"
+		android:layout_marginBottom="16dp"
+		android:contentDescription="Back"
+		android:src="@drawable/arrow_back_24px" />
+	<ImageView
+		android:id="@+id/saveButton"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:gravity="center"
-		android:orientation="horizontal"
-		app:layout_constraintTop_toTopOf="parent"
-		tools:ignore="MissingConstraints">
+		android:src="@drawable/sharp_check_24"
+		android:layout_alignParentEnd="true"
+		android:layout_margin="16dp"
+		android:contentDescription="Back" />
 
-		<TextView
-			android:id="@+id/diary"
-			android:layout_width="74.4dp"
-			android:layout_height="36.4dp"
-			android:gravity="center"
-			android:text="@string/diary_string"
-			android:textColor="@color/diary_color"
-			android:textSize="24sp"
-			android:textStyle="bold" />
-
-	</LinearLayout>
-
-
-	<TextView
-		android:id="@+id/wednesday__march_27___2024"
-		android:layout_width="204.4dp"
-		android:layout_height="21.4dp"
-		android:layout_gravity="center_horizontal|center"
-		android:gravity="center"
-		android:text="@string/wednesday__march_27___2024_string"
-		android:textColor="@color/diary_color"
-		android:textSize="14sp"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
-
+	<!-- Title Input -->
 	<EditText
-		android:id="@+id/entry_title"
+		android:id="@+id/titleEditText"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_below="@id/backButton"
+		android:layout_marginStart="16dp"
+		android:layout_marginTop="16dp"
+		android:layout_marginEnd="16dp"
+		android:layout_marginBottom="16dp"
+		android:background="@null"
 		android:hint="Title"
 		android:inputType="text"
-		android:padding="16dp"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@id/wednesday__march_27___2024">
+		android:textColor="#E0E0E0"
+		android:textColorHint="#757575"
+		android:textSize="24sp" />
 
-	</EditText>
-
+	<!-- Note Input -->
 	<EditText
-		android:id="@+id/entry_content"
+		android:id="@+id/noteEditText"
+		android:layout_width="match_parent"
+		android:layout_height="0dp"
+		android:layout_below="@id/titleEditText"
+		android:layout_above="@id/bottomBar"
+		android:layout_marginStart="16dp"
+		android:layout_marginEnd="16dp"
+		android:layout_marginTop="8dp"
+		android:hint="Note"
+		android:textColorHint="#757575"
+		android:textSize="18sp"
+		android:textColor="#E0E0E0"
+		android:background="@null"
+		android:inputType="textMultiLine"
+		android:gravity="top" />
+
+	<!-- Bottom Bar -->
+	<LinearLayout
+		android:gravity="center"
+		android:id="@+id/bottomBar"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:hint="Write your diary entry here..."
-		android:inputType="textMultiLine"
-		android:padding="16dp"
-		android:textSize="16sp"
-		app:layout_constraintTop_toBottomOf="@id/entry_title" />
+		android:layout_alignParentBottom="true"
+		android:orientation="horizontal"
+		android:padding="8dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+		<!-- Add Button -->
+		<ImageView
+			android:id="@+id/addButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_add_box_24px"
+			android:contentDescription="Add"
+			android:padding="8dp" />
+
+		<!-- Color Picker Button -->
+		<ImageView
+			android:id="@+id/colorPickerButton"
+			android:layout_width="40dp"
+			android:layout_height="40dp"
+			android:contentDescription="Color Picker"
+
+			android:padding="8dp"
+			android:src="@drawable/ic_palette_24px" />
+
+		<!-- Text Style Button -->
+		<ImageView
+			android:id="@+id/textStyleButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_text_style"
+			android:contentDescription="Text Style"
+			android:padding="8dp" />
+
+		<!-- Timestamp Text -->
+		<TextView
+			android:id="@+id/timestampTextView"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="Edited just now"
+			android:textColor="#757575"
+			android:gravity="left"
+			android:paddingStart="16dp" />
+
+		<!-- More Options Button -->
+		<ImageView
+			android:id="@+id/moreOptionsButton"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
+			android:src="@drawable/ic_more_vert_24px"
+			android:contentDescription="More Options"
+			android:padding="8dp"
+			/>
+	</LinearLayout>
+</RelativeLayout>

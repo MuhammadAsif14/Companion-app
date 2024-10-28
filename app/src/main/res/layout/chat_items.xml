@@ -9,8 +9,9 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/chat_content_orange"
-        app:cardCornerRadius="200dp"
+        android:backgroundTint="#813D0E"
+        app:cardCornerRadius="20dp"
+        android:layout_margin="2dp"
         >
 
         <RelativeLayout

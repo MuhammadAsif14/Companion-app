@@ -58,7 +58,7 @@ class FaceDetectionActivity : AppCompatActivity() {
 
     // Load MobileNetV2 model from assets
     private fun loadModel(): Interpreter {
-        val assetFileDescriptor = assets.openFd("BestModel66.tflite")
+        val assetFileDescriptor = assets.openFd("model.tflite")
         val inputStream = assetFileDescriptor.createInputStream()
         val modelBytes = inputStream.readBytes()
         val buffer = ByteBuffer.allocateDirect(modelBytes.size).order(ByteOrder.nativeOrder())
@@ -171,6 +171,33 @@ class FaceDetectionActivity : AppCompatActivity() {
                                 val emotionLabel = getEmotionLabel(emotionProbabilities)
                                 emotionTextView.text = emotionLabel
                                 Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+                                Log.d(TAG, "Detected Emotion: $emotionLabel")
+
+                                Log.d(TAG, "Emotion Prob: $emotionProbabilities")
+
+                                Log.d(TAG, "Emotion Prob: $emotionProbabilities")
+                                Log.d(TAG, "Emotion Prob: $emotionProbabilities")
+                                Log.d(TAG, "Emotion Prob: $emotionProbabilities")
+                                Log.d(TAG, "Emotion Prob: $emotionProbabilities")
+                                Log.d(TAG, "Emotion Prob: $emotionProbabilities")
+                                // Iterate through the probabilities and log each value
+                                for (i in emotionProbabilities.indices) {
+                                    val probability = emotionProbabilities[i]
+                                    Log.d("EmotionProb", "Emotion $i: $probability")
+                                }
+
 
                                 // You can now display this emotion in the UI or handle it as needed
                             }
@@ -239,7 +266,9 @@ class FaceDetectionActivity : AppCompatActivity() {
     private fun getEmotionLabel(probabilities: FloatArray): String {
         val labels = arrayOf("Angry", "Disgust", "Happy", "Sad", "Neutral", "Fear", "Surprise")
         val maxIndex = probabilities.indices.maxByOrNull { probabilities[it] } ?: -1
+
         return if (maxIndex != -1) labels[maxIndex] else "Unknown"
+
     }
 
     companion object {

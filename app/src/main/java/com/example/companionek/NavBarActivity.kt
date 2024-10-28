@@ -23,6 +23,10 @@ class NavBarActivity : AppCompatActivity() {
                     replaceFragment(HomeFragment())
                     true // Indicate that you handled the selection
                 }
+                R.id.diary_menu-> {
+                    replaceFragment(NotesMenuFragment())
+                    true // Indicate that you handled the selection
+                }
                 R.id.profile -> {
                     replaceFragment(ProfileFragment())
                     true // Indicate that you handled the selection
@@ -34,8 +38,7 @@ class NavBarActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
-// Optional: Handle reselection to refresh the current fragment
+        // Optional: Handle reselection to refresh the current fragment
         binding.bottomNavigationBar.setOnItemReselectedListener { item ->
             when(item.itemId) {
                 R.id.home -> {
@@ -44,8 +47,10 @@ class NavBarActivity : AppCompatActivity() {
                 R.id.profile -> {
                     // Refresh or scroll to the top of ProfileFragment if necessary
                 }
+
             }
         }
+
 
     }
     private fun replaceFragment(fragment: Fragment){

@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.companionek.adapter.ChatAdapter
-import com.example.companionek.adapter.DiaryAdapter
 import com.example.companionek.adapter.MoodAdapter
 import com.example.companionek.utils.DiaryItems
 import com.google.firebase.auth.FirebaseAuth
@@ -121,7 +120,7 @@ class HomeActivity : AppCompatActivity() {
         newRecyclerViewDiary.layoutManager=LinearLayoutManager(this)
         newRecyclerViewDiary.setHasFixedSize(true)
         diaryEntries= arrayListOf<DiaryItems>()
-        getDiaryData()
+//        getDiaryData()
 
 
         //arrowvector
@@ -225,14 +224,14 @@ private fun getUserChatData() {
         }
         newRecyclerView.adapter = MoodAdapter(newArrayList)
     }
-    private fun getDiaryData(){
-        for(i in dTitle.indices){
-            val diary = DiaryItems(dTitle[i],dContent[i], dDate[i])
-            diaryEntries.add(diary)
-        }
-        newRecyclerViewDiary.adapter = DiaryAdapter(diaryEntries)
-
-    }
+//    private fun getDiaryData(){
+//        for(i in dTitle.indices){
+//            val diary = DiaryItems(dTitle[i],dContent[i], dDate[i])
+//            diaryEntries.add(diary)
+//        }
+//        newRecyclerViewDiary.adapter = DiaryAdapter(diaryEntries)
+//
+//    }
 
 
 }

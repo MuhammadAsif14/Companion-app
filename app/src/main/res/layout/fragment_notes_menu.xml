@@ -5,23 +5,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChatMenuFragment"
-    android:id="@+id/chatMenuLayout"
-    android:background="@drawable/roundstyle"
-    android:backgroundTint="#532606">
+    tools:context=".NotesMenuFragment"
+    android:id="@+id/notesMenuLayout"
+    android:background="@drawable/_bg__frame_3_ek1_shape"
+    >
 
     <TextView
         android:id="@+id/chat_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/chat_title_orange"
+        android:layout_margin="10dp"
+        android:background="#000000"
         android:freezesText="true"
         android:paddingStart="15dp"
         android:paddingTop="10dp"
         android:paddingEnd="15dp"
-        android:text="Chat"
+        android:paddingBottom="10dp"
+        android:text="Notes"
         android:textAlignment="textStart"
-        android:textColor="@color/white"
+        android:textColor="#FDF8F8"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,7 +31,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/recycle_view_layout_chat"
+        android:id="@+id/recycle_view_layout_diary"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@drawable/roundstyle"
@@ -41,7 +43,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/ch_recyclerView"
+            android:id="@+id/diary_recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -52,7 +54,7 @@
 
     <!-- Floating Action Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_new_chat"
+        android:id="@+id/fab_new_note"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -60,7 +62,6 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_new_chat"
         android:contentDescription="new_chat"
-
         android:backgroundTint="#702710" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

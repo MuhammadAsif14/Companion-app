@@ -8,8 +8,19 @@
     android:orientation="vertical"
 
     >
-
-
+    <!-- Floating Action Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_music"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/music_note_24px"
+        android:backgroundTint="@color/transparent"
+        android:contentDescription="new_chat"
+        app:borderWidth="0dp"
+        app:fabSize="mini"
+        />
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/child_layout1"
         android:layout_width="0dp"

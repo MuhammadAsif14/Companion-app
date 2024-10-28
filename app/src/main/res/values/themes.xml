@@ -1,18 +1,21 @@
-    <resources xmlns:tools="http://schemas.android.com/tools">
-        <!-- Base application theme. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style
+        name="MyTheme.Splash"
+        parent="Theme.Material3.DayNight.NoActionBar">
 
-        <style
-            name="MyTheme.Splash"
-            parent="Theme.Material3.DayNight.NoActionBar"
-            >
+        <item name="colorPrimary">@color/colorPrimary</item>
 
-            <item name="android:windowIsTranslucent">true</item>
-            <item name="android:windowBackground">@drawable/gradient_color</item>
-            <item name="windowNoTitle">true</item>
-            <item name="android:windowFullscreen">true</item>
-            <item name="android:windowContentOverlay">@null</item>
-            <item name="windowActionBar">true</item>
+        <!-- Make sure this is false so that status bar color is applied -->
+        <item name="android:windowIsTranslucent">false</item>
 
-        </style>
-    </resources>
-    
+        <item name="android:windowBackground">@drawable/gradient_color</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="windowActionBar">true</item>
+
+        <!-- Status bar color -->
+        <item name="android:statusBarColor" tools:targetApi="lollipop_mr1">@color/colorPrimary</item>
+    </style>
+</resources>

@@ -17,7 +17,9 @@ import com.bumptech.glide.Glide
 import com.example.companionek.adapter.ChatAdapter
 import com.example.companionek.adapter.DiaryAdapter
 import com.example.companionek.adapter.MoodAdapter
+import com.example.companionek.data.Note
 import com.example.companionek.utils.DiaryItems
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -28,11 +30,15 @@ class HomeFragment : Fragment() {
 
     private lateinit var newRecyclerView: RecyclerView
     private lateinit var newRecyclerView2: RecyclerView
-    private lateinit var newRecyclerViewDiary: RecyclerView
+    private lateinit var noteRecyclerView: RecyclerView
 
     private lateinit var newArrayList: ArrayList<MoodItems>
     private lateinit var newArrayList2: ArrayList<ChatItems>
     private lateinit var diaryEntries: ArrayList<DiaryItems>
+
+    private val notesArrayList = ArrayList<Pair<Note, String>>()
+
+    private lateinit var fabMusic: FloatingActionButton
 
     private lateinit var wImageId: Array<Int>
     private lateinit var wTitle: Array<String>
@@ -67,9 +73,13 @@ class HomeFragment : Fragment() {
         newRecyclerView2.layoutManager = LinearLayoutManager(activity)
         newRecyclerView2.setHasFixedSize(true)
 
-        newRecyclerViewDiary = rootView.findViewById(R.id.diary_recyclerView)
-        newRecyclerViewDiary.layoutManager = LinearLayoutManager(activity)
-        newRecyclerViewDiary.setHasFixedSize(true)
+        noteRecyclerView = rootView.findViewById(R.id.diary_recyclerView)
+        noteRecyclerView.layoutManager = LinearLayoutManager(activity)
+        noteRecyclerView.setHasFixedSize(true)
+        fabMusic=rootView.findViewById(R.id.fab_music)
+        fabMusic.setOnClickListener {
+            openNewChatActivity() // Replace this with your desired action
+        }
 
         // Initialize the data lists
         newArrayList = arrayListOf()
@@ -83,7 +93,7 @@ class HomeFragment : Fragment() {
 
         // Set adapters
         newRecyclerView.adapter = MoodAdapter(newArrayList)
-        newRecyclerViewDiary.adapter = DiaryAdapter(diaryEntries)
+//        newRecyclerViewDiary.adapter = DiaryAdapter(diaryEntries)
 
         // Button listeners for navigation
         rootView.findViewById<View>(R.id.mood_title).setOnClickListener {
@@ -100,39 +110,17 @@ class HomeFragment : Fragment() {
             val intent = Intent(activity, diary_activity::class.java)
             startActivity(intent)
         }
-
+        getUserNoteData()
         // Load user profile
         loadUserProfile(rootView)
         return rootView
     }
+    private fun openNewChatActivity() {
+        // Start your new chat activity or perform your action
+        val intent = Intent(requireContext(), BackgroundMusicActivity::class.java)
+        startActivity(intent)
+    }
 
-//    private fun loadUserProfile(rootView: View) {
-//        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-//        val userRef = FirebaseDatabase.getInstance().getReference("user").child(userId)
-//
-//        userRef.get().addOnSuccessListener { snapshot ->
-//            if (snapshot.exists()) {
-//                val displayName = snapshot.child("userName").value.toString()
-//                val profileImageUrl = snapshot.child("profilepic").value
-//
-//                Log.d(TAG, "loadUserProfile: $displayName")
-//                Log.d(TAG, "loadUserProfile: $profileImageUrl")
-//                rootView.findViewById<TextView>(R.id.greeting_text).text = "Hello, $displayName"
-//                val profileImageView = view?.findViewById<CircleImageView>(R.id.profile_image)
-//
-//                // Use Glide to load the image URL into the CircleImageView
-//                if (profileImageView != null) {
-//                    Glide.with(this)
-//                        .load(profileImageUrl)
-//                        .placeholder(R.drawable.userprofile) // Placeholder image
-//                        .error(R.drawable.picture)           // Fallback image
-//                        .into(profileImageView)
-//                }
-//            }
-//        }.addOnFailureListener {
-//            // Handle errors here
-//        }
-//    }
 
     private fun loadUserProfile(rootView: View) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -165,46 +153,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-//
-//    private fun getUserChatData() {
-//        userId?.let { uid ->
-//            database = FirebaseDatabase.getInstance().getReference("user").child(uid)
-//            database.child("chatSessions").addListenerForSingleValueEvent(object : ValueEventListener {
-//                override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                    newArrayList2.clear() // Clear previous chat sessions
-//                    for (sessionSnapshot in dataSnapshot.children) {
-//                        val emotions = sessionSnapshot.child("emotions").children.map { it.getValue(String::class.java) ?: "" }
-//                        val sessionId = sessionSnapshot.key ?: "" // Get the session ID
-//
-//                        // Create a ChatItems instance for this chat session
-//                        val chatItem = ChatItems(
-//                            image = R.drawable.happy_emoji, // Use a placeholder image
-//                            chatTitle = emotions.joinToString(", "), // Combine emotions
-//                            text = "Chat session with ${emotions.joinToString(", ")} emotions.",
-//                            sessionId = sessionId // Pass the session ID here
-//                        )
-//                        newArrayList2.add(chatItem) // Add the session item to the list
-//                    }
-//
-//                    // Set the adapter with the updated data
-//                    newRecyclerView2.adapter = ChatAdapter(newArrayList2) { sessionId ->
-//                        onChatItemClick(sessionId)
-//                    }
-//                }
-//
-//                override fun onCancelled(databaseError: DatabaseError) {
-//                    Log.e("HomeFragment", "Error retrieving chat data: ${databaseError.message}")
-//                }
-//            })
-//        }
-//    }
-//
-//    private fun onChatItemClick(sessionId: String) {
-//        // Start the chat screen activity and pass the session ID
-//        val intent = Intent(activity, chat_screen::class.java)
-//        intent.putExtra("SESSION_ID", sessionId) // Pass the session ID
-//        startActivity(intent)
-//    }
 private fun getUserChatData() {
     userId?.let { uid ->
         // Reference to user's chatSessions collection in Firestore
@@ -250,6 +198,44 @@ private fun getUserChatData() {
         intent.putExtra("isSessionCreated",true)
         startActivity(intent)
     }
+
+    private fun getUserNoteData() {
+        userId?.let { uid ->
+            val notesRef = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .collection("Notes")
+
+            notesRef.get()
+                .addOnSuccessListener { notesSnapshot ->
+                    notesArrayList.clear() // Clear the list before adding new data
+                    for (noteSnapshot in notesSnapshot.documents) {
+                        val noteId = noteSnapshot.id
+                        Log.d("noteID", "NoteID: $noteId")
+
+                        // Convert Firestore document to Note object
+                        val note = noteSnapshot.toObject(Note::class.java)
+                        if (note != null) {
+                            notesArrayList.add(Pair(note, noteId)) // Add Pair of Note and noteId
+                        }
+                    }
+                    noteRecyclerView.adapter = DiaryAdapter(notesArrayList) { noteId ->
+                        // Handle the click by opening the detail activity with the noteId
+                        val intent = Intent(requireContext(), diary_activity::class.java)
+                        intent.putExtra("NOTE_ID", noteId)
+                        startActivity(intent)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("ChatMenuFragment", "Error retrieving chat data: ${exception.message}", exception)
+                }
+        }
+    }
+
+
+
+
+
 //    private fun getUserWeekData() {
 //        for (i in wTitle.indices) {
 //            val mood = MoodItems(wImageId[i], wTitle[i], wDay[i], wDate[i])

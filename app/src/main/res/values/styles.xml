@@ -14,10 +14,8 @@
 		<item name="colorPrimary">@color/colorPrimary</item>
 		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
 		<item name="colorAccent">@color/colorAccent</item>
-
 		<item name="android:statusBarColor">#fff</item>
 		<item name="android:windowLightStatusBar">true</item>
-
 		<item name="android:navigationBarColor">#E4E4E4</item>
 		<item name="android:windowLightNavigationBar">true</item>
 
@@ -41,6 +39,9 @@
 		<item name="colorAccent">@color/textInputLayout</item>
 		<item name="android:textColorHint">@color/textInputLayout</item>
 	</style>
+
+
+
 
 
 </resources>

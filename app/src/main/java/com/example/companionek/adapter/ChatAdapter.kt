@@ -67,7 +67,6 @@ class ChatAdapter(
         holder.title.text = currentItem.chatTitle
         holder.text.text = currentItem.text
         holder.image.setImageResource(currentItem.image)
-
         // Set the click listener for the item
         holder.itemView.setOnClickListener {
             onItemClick(currentItem.sessionId) // Pass the session ID on click

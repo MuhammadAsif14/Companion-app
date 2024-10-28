@@ -127,7 +127,6 @@ class chat_screen: AppCompatActivity() {
         // Load previous messages if session is already created
         if (isSessionCreated && chatSessionId!!.isNotEmpty()) {
             Log.e("chatSessionID", "Chat session ID:$chatSessionId")
-
             Log.e("Loading ", "Chat session ID:$chatSessionId")
 
             loadPreviousMessages()
@@ -154,7 +153,6 @@ private fun loadPreviousMessages() {
         Log.e("chat_screen", "Chat session ID is null")
         return
     }
-
     // Reference to the chat session's messages collection in Firestore
     chatSessionRef = firestore.collection("users")
         .document(userId)
@@ -245,7 +243,6 @@ private fun loadPreviousMessages() {
             }
         }
     }
-
     fun saveChatMessage(messageText: String, sender: String) {
         if (userId != null && chatSessionId != null) {
             // Generate a unique document ID for the message
