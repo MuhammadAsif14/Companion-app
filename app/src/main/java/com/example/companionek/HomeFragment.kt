@@ -143,7 +143,7 @@ class HomeFragment : Fragment() {
                     Glide.with(this)
                         .load(profileImageUrl)
                         .placeholder(R.drawable.userprofile) // Placeholder image
-                        .error(R.drawable.picture)           // Fallback image
+                        .error(R.drawable.profile)           // Fallback image
                         .into(profileImageView)
                 }
             }

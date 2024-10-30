@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("kotlin-parcelize") // Add this line
 }
 
 android {
@@ -113,7 +114,8 @@ dependencies {
     implementation ("androidx.navigation:navigation-ui-ktx:2.8.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
     implementation("androidx.navigation:navigation-fragment-ktx:2.8.3")
-
+    implementation ("com.github.lisawray.groupie:groupie:2.10.1")
+    implementation ("com.squareup.picasso:picasso:2.8")
 
 
 }

@@ -16,8 +16,21 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity2ChatFreature"
-            android:exported="false" />
+            android:name=".ChatLogActivity"
+            android:exported="false"
+            android:parentActivityName=".NewMessageActivity"
+            android:theme="@style/AppTheme.TransparentActionBar"/>
+        <activity
+            android:name=".NewMessageActivity"
+            android:exported="false"
+            android:label="Select User"
+            android:parentActivityName=".LatestMessagesActivity"
+            android:theme="@style/AppTheme.TransparentActionBar" />
+        <activity
+            android:name=".LatestMessagesActivity"
+            android:exported="true"
+            android:label="User Chats"
+            android:theme="@style/AppTheme.TransparentActionBar" />
 
         <service
             android:name=".MusicService"

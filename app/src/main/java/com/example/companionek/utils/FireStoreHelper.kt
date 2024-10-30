@@ -5,6 +5,7 @@ import com.example.companionek.Users
 import com.example.companionek.data.ChatMessage
 import com.example.companionek.data.ChatSession
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -27,21 +28,52 @@ class FirestoreHelper {
     }
 
     // Function to add a new user
-    suspend fun addUser(username: String, profilePicUrl: String, email: String, password: String, userId: String): Boolean {
+//    suspend fun addUser(username: String, profilePicUrl: String, email: String, password: String, userId: String): Boolean {
+//        return try {
+//            // Create user data object
+//            val user = Users(
+//                userId = userId,
+//                userName = username,
+//                maill = email, // This will map to 'mail' in your Users class
+//                password = password, // You may want to handle passwords more securely
+//                profilepic = profilePicUrl
+//            )
+//
+//            // Save user data to Firestore
+//            db.collection("users").document(userId).set(user).await()
+//
+//            Log.e("FirestoreHelper", "SUCCESSFULLY ADDED USER")
+//            true // Return true indicating success
+//
+//        } catch (e: Exception) {
+//            Log.e("FirestoreHelper", "Error adding user", e)
+//            false // Return false indicating failure
+//        }
+//    }
+    suspend fun addUser(
+        username: String,
+        profilePicUrl: String,
+        email: String,
+        password: String,
+        userId: String
+    ): Boolean {
         return try {
             // Create user data object
             val user = Users(
                 userId = userId,
                 userName = username,
-                maill = email, // This will map to 'mail' in your Users class
-                password = password, // You may want to handle passwords more securely
+                mail = email,
+                password = password,
                 profilepic = profilePicUrl
             )
 
             // Save user data to Firestore
-            db.collection("users").document(userId).set(user).await()
+            addUserToFirestore(user)
 
-            Log.e("FirestoreHelper", "SUCCESSFULLY ADDED USER")
+            // Save user data to Realtime Database
+            addUserToRealtimeDb(user)
+
+            Log.e("FirestoreHelper", "SUCCESSFULLY ADDED USER TO BOTH DATABASES")
             true // Return true indicating success
 
         } catch (e: Exception) {
@@ -49,6 +81,16 @@ class FirestoreHelper {
             false // Return false indicating failure
         }
     }
+
+    private suspend fun addUserToFirestore(user: Users) {
+        user.userId?.let { db.collection("users").document(it).set(user).await() }
+    }
+
+    private suspend fun addUserToRealtimeDb(user: Users) {
+        val ref = FirebaseDatabase.getInstance().getReference("/users/${user.userId}")
+        ref.setValue(user).await()
+    }
+
 
 
 

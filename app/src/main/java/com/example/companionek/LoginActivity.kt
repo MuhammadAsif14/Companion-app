@@ -1,5 +1,4 @@
 package com.example.companionek
-
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Color
@@ -18,6 +17,7 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.Calendar
+
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
@@ -113,7 +113,7 @@ class LoginActivity : AppCompatActivity() {
         // Change image and greeting based on the time of day
         when {
             hour in 5..11 -> { // Morning (5 AM to 11:59 AM)
-                imageView.setImageResource(R.drawable.morning_img)
+                imageView.setImageResource(R.drawable.good_morning_img)
                 greetingTextView.text = "Good Morning"
                 greetingTextView.setTextColor(Color.parseColor("#FFD700")) // Gold color
 
@@ -128,7 +128,7 @@ class LoginActivity : AppCompatActivity() {
             }
 
             hour in 12..16 -> { // Afternoon (12 PM to 4:59 PM)
-                imageView.setImageResource(R.drawable.afternoon_img)
+                imageView.setImageResource(R.drawable.afternoon)
                 greetingTextView.text = "Good Afternoon"
                 greetingTextView.setTextColor(Color.parseColor("#FF9800")) // OrangeRed color
                 // EditText Background and Text Colors
@@ -136,6 +136,33 @@ class LoginActivity : AppCompatActivity() {
 //                passwordEditText.setBackgroundColor(resources.getColor(R.color.edittext_afternoon_bg, theme))
                 emailEditText.setTextColor(resources.getColor(R.color.text_afternoon, theme))
                 passwordEditText.setTextColor(resources.getColor(R.color.text_afternoon, theme))
+
+
+                // Button Background and Text Colors
+                signInButton.setBackgroundColor(resources.getColor(R.color.button_afternoon_bg, theme))
+                signInButton.setTextColor(resources.getColor(R.color.text_afternoon, theme))
+                val backgroundDrawable = resources.getDrawable(R.drawable.buttonshapegoldenbg)
+                signInButton.background = backgroundDrawable
+                val forgetpassText=findViewById<TextView>(R.id.forgetPass)
+                val newtocompanionText=findViewById<TextView>(R.id.joinText)
+                newtocompanionText.setTextColor(Color.BLACK)
+                forgetpassText.setTextColor(Color.BLACK)
+
+
+
+            }
+            hour in 17..22 -> { // Afternoon (5 PM to 10 PM)
+                imageView.setImageResource(R.drawable.good_night_img)
+                greetingTextView.text = "Good Evening"
+                greetingTextView.setTextColor(Color.parseColor("#FF9800")) // OrangeRed color
+                // EditText Background and Text Colors
+//                emailEditText.setBackgroundColor(resources.getColor(R.color.edittext_afternoon_bg, theme))
+//                passwordEditText.setBackgroundColor(resources.getColor(R.color.edittext_afternoon_bg, theme))
+                emailEditText.setTextColor(resources.getColor(R.color.text_afternoon, theme))
+                passwordEditText.setTextColor(resources.getColor(R.color.text_afternoon, theme))
+                val backgroundDrawable = resources.getDrawable(R.drawable.buttonshapewhitebg)
+                signInButton.background = backgroundDrawable
+
 
                 // Button Background and Text Colors
                 signInButton.setBackgroundColor(resources.getColor(R.color.button_afternoon_bg, theme))
@@ -145,7 +172,7 @@ class LoginActivity : AppCompatActivity() {
 
             else -> { // Evening/Night (5 PM to 4:59 AM)
                 imageView.setImageResource(R.drawable.good_night_img)
-                greetingTextView.text = "Good Evening"
+                greetingTextView.text = "Good Night"
 //                greetingTextView.setTextColor(Color.parseColor("#1E90FF")) // DodgerBlue color
                 // EditText Background and Text Colors
 //                emailEditText.setBackgroundColor(resources.getColor(R.color.edittext_evening_bg, theme))

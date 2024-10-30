@@ -1,5 +1,6 @@
 package com.example.companionek
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -22,6 +23,12 @@ class NavBarActivity : AppCompatActivity() {
                 R.id.home -> {
                     replaceFragment(HomeFragment())
                     true // Indicate that you handled the selection
+                }
+                R.id.chat_users -> {
+                    // Start the activity when `chat_users` is selected
+                    val intent = Intent(this, LatestMessagesActivity::class.java)
+                    startActivity(intent)
+                    true
                 }
                 R.id.diary_menu-> {
                     replaceFragment(NotesMenuFragment())

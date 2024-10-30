@@ -3,10 +3,21 @@
 	<!-- my_mood styles -->
 
 	<style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-		<item name="colorPrimary">@color/colorPrimary</item>
+	<item name="colorPrimary">@color/colorPrimary</item>
 		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
 		<item name="colorAccent">@color/colorAccent</item>
 	</style>
+
+	<style name="AppTheme.TransparentActionBar" parent="Theme.AppCompat.Light">
+	<item name="windowActionBar">true</item>
+	<item name="windowActionBarOverlay">true</item>
+	<item name="android:windowContentOverlay">@null</item>
+	<item name="colorPrimary">@android:color/transparent</item>
+	<item name="colorPrimaryDark">@android:color/transparent</item>
+	<item name="colorAccent">@color/colorAccent</item>
+
+</style>
+
 
 	<!-- Base theme for chat. -->
 	<style name="ChatTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -38,6 +49,7 @@
 		<item name="colorControlHighlight">@color/textInputLayout</item>
 		<item name="colorAccent">@color/textInputLayout</item>
 		<item name="android:textColorHint">@color/textInputLayout</item>
+		<item name="hintTextColor">@color/black</item>
 	</style>
 
 

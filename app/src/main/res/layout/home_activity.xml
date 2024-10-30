@@ -35,7 +35,7 @@
             android:id="@+id/greeting_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hello, Ayesha"
+            android:text="Hello, Mate"
             android:textSize="27sp"
             android:textStyle="bold"
             app:drawableRightCompat="@drawable/greetingicon"
@@ -50,7 +50,7 @@
             android:layout_height="50dp"
             android:background="@drawable/userprofile"
             android:layout_gravity="center"
-            android:src="@drawable/picture"
+            android:src="@drawable/profile"
             app:layout_constraintEnd_toEndOf="parent"
             app:civ_border_color="#FF000000"
             android:layout_marginEnd="20dp"
@@ -149,7 +149,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/chat"
-        android:layout_width="369dp"
+        android:layout_width="0dp"
         android:layout_height="190dp"
         android:layout_below="@+id/myMood"
         android:background="@drawable/roundstyle"
@@ -194,7 +194,6 @@
                 android:id="@+id/ch_recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
 
@@ -210,12 +209,11 @@
         android:layout_height="200dp"
         android:layout_below="@+id/chat"
         android:background="@drawable/diary"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chat"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="@+id/guideline1"
-        tools:layout_editor_absoluteX="21dp">
+        >
 
         <TextView
             android:id="@+id/diary_title"
@@ -248,7 +246,6 @@
                 android:id="@+id/diary_recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
 
 

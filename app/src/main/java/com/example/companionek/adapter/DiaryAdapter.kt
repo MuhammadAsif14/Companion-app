@@ -48,32 +48,3 @@ class DiaryAdapter(
         val date: TextView = itemView.findViewById(R.id.date)
     }
 }
-
-//class DiaryAdapter(val entries: ArrayList<Note>) : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
-//
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DiaryViewHolder {
-//        val view = LayoutInflater.from(parent.context).inflate(R.layout.note, parent, false)
-//        return DiaryViewHolder(view)
-//    }
-//
-//    override fun onBindViewHolder(holder: DiaryViewHolder, position: Int) {
-//        val entry = entries[position]
-//        holder.title.text = entry.title
-//        holder.content.text = entry.content
-//        val dateFormat = SimpleDateFormat("dd MMM yyyy") // Change format as desired
-//        val formattedDate: String = dateFormat.format(entry.timestamp)
-//        holder.date.text = formattedDate
-//        // Set date or other fields as needed
-//
-//    }
-//
-//    override fun getItemCount() = entries.size
-//    class DiaryViewHolder (itemView: View) :RecyclerView.ViewHolder(itemView){
-////        val image: ImageView = itemView.findViewById(R.id.chat_imageView)
-//        val title: TextView = itemView.findViewById(R.id.note_title)
-//        val content: TextView = itemView.findViewById(R.id.text)
-//        val date:TextView=itemView.findViewById(R.id.date)
-//
-//    }
-//
-//}

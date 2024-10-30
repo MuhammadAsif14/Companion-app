@@ -136,74 +136,6 @@ class SignUpActivity : AppCompatActivity() {
         startActivity(intent)
 
     }
-//private fun registerUser(email: String, password: String, newDisplayName: String) {
-//    lifecycleScope.launch {
-//
-//        try {
-//            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this@SignUpActivity) { task ->
-//                if (task.isSuccessful) {
-//                     id = task.result?.user?.uid ?: ""
-//                    storageReference = storage.reference.child("Upload").child(id)
-//
-//                    if (imageURI != null) {
-//                        storageReference.putFile(imageURI)
-//                            .addOnSuccessListener {
-//                                storageReference.downloadUrl.addOnSuccessListener { uri ->
-//                                    val imageUri = uri.toString()
-//                                    callAddUser(imageUri, id) { isSuccess ->
-//                                        if (isSuccess) {
-//                                            Log.d(TAG, "User added successfully.")
-//                                            val intent = Intent(this@SignUpActivity, landing_1_activity::class.java)
-//                                            startActivity(intent)
-//                                            finish()
-//                                        } else {
-//                                            Log.d(TAG, "Failed to add user.")
-//                                            Toast.makeText(this@SignUpActivity, "Error adding user data", Toast.LENGTH_SHORT).show()
-//
-//                                        }
-//                                    }
-//
-//
-//
-//                                }
-//                            }
-//
-//                    } else {
-//                        Toast.makeText(this@SignUpActivity, "User did not select profile pic saving default pic", Toast.LENGTH_SHORT).show()
-//                            imageURI = Uri.parse("https://firebasestorage.googleapis.com/v0/b/companion-11996.appspot.com/o/man.png?alt=media&token=10104ab8-f99e-4447-bbb0-5c8ff35115b8")
-//                            profilePic.setImageURI(imageURI)
-//                            callAddUser(imageURI.toString(), id) { isSuccess ->
-//                            if (isSuccess) {
-//                                Log.d(TAG, "User added successfully.")
-//                                val intent = Intent(this@SignUpActivity, landing_1_activity::class.java)
-//                                startActivity(intent)
-//                                finish()
-//                            } else {
-//                                Log.d(TAG, "Failed to add user.")
-//                                Toast.makeText(this@SignUpActivity, "Error adding user data", Toast.LENGTH_SHORT).show()
-//
-//                            }
-//                        }
-//
-//
-//
-//                    }
-//                    Toast.makeText(baseContext, "Launch landing_1_activity regardless of image upload/database completion", Toast.LENGTH_SHORT).show()
-//                    // Launch landing_1_activity regardless of image upload/database completion
-//                    val intent = Intent(this@SignUpActivity, landing_1_activity::class.java)
-//                    startActivity(intent)
-//                    finish()
-//                } else {
-//                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
-//                    Toast.makeText(baseContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        } catch (e: Exception) {
-//            Toast.makeText(this@SignUpActivity, "Registration failed: ${e.message}", Toast.LENGTH_LONG).show()
-//            println(e.message)
-//        }
-//    }
-//}
 private fun registerUser(email: String, password: String, newDisplayName: String) {
     lifecycleScope.launch {
         try {
@@ -221,6 +153,9 @@ private fun registerUser(email: String, password: String, newDisplayName: String
                                     callAddUser(imageUri, id) { isSuccess ->
                                         if (isSuccess) {
                                             Log.d(TAG, "User added successfully.")
+                                            //also adding in realtime db for chat feature
+
+
                                             launchLandingActivity()
                                         } else {
                                             Log.d(TAG, "Failed to add user.")

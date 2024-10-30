@@ -13,10 +13,17 @@
         android:icon="@drawable/diary_menu_png"
         />
     <item
-        android:id="@+id/chat_menu"
-        android:title="Chat menu"
+        android:id="@+id/chat_users"
+        android:title="Chats"
         android:icon="@drawable/chat_menu"
         />
+
+    <item
+        android:id="@+id/chat_menu"
+        android:title="Chatbot"
+        android:icon="@drawable/icon_chatbot"
+        />
+
 
     <item
         android:id="@+id/profile"
