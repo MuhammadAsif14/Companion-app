@@ -39,6 +39,12 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    packagingOptions {
+        exclude ("META-INF/DEPENDENCIES")
+        exclude( "META-INF/LICENSE")
+        exclude( "META-INF/NOTICE")
+        // Add any other files that might cause conflicts
+    }
 }
 
 dependencies {
@@ -50,6 +56,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.1")
     implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
+    implementation("com.google.firebase:firebase-messaging:24.0.3")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
@@ -116,6 +123,8 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.8.3")
     implementation ("com.github.lisawray.groupie:groupie:2.10.1")
     implementation ("com.squareup.picasso:picasso:2.8")
+
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.15.0")
 
 
 }

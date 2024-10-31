@@ -194,6 +194,10 @@
             android:layout_marginBottom="8dp"
             android:gravity="center"
             android:orientation="vertical">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
 
             <Button
                 android:id="@+id/signUpButton"
@@ -203,9 +207,20 @@
                 android:fontFamily="@font/calibri"
                 android:text="Sign up"
                 android:textAllCaps="false"
+                android:layout_gravity="center"
                 android:textStyle="bold"
                 android:textColor="#96ffffff"
                 android:textSize="16sp" />
+            <ProgressBar
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:id="@+id/progressBar"
+                android:layout_gravity="center"
+                android:visibility="invisible">
+
+            </ProgressBar>
+
+        </FrameLayout>
             <TextView
                 android:id="@+id/loginText"
                 android:layout_marginTop="10dp"

@@ -1,13 +1,12 @@
 package com.example.companionek
-import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +19,8 @@ import java.util.Calendar
 
 
 class LoginActivity : AppCompatActivity() {
+    private lateinit var progressBar: ProgressBar
+
     private lateinit var imageView: ImageView
     private lateinit var greetingTextView: TextView
     private lateinit var emailEditText: EditText
@@ -39,6 +40,7 @@ class LoginActivity : AppCompatActivity() {
         emailEditText = findViewById(R.id.emailEditText)  // Assume this is your EditText ID for email
         passwordEditText = findViewById(R.id.passwordEditText)  // Assume this is your EditText ID for password
         signInButton = findViewById(R.id.signInButton)  // Assume this is your Button ID for sign in
+        progressBar = findViewById(R.id.progressBar) // Initializing the ProgressBar
 
 
         auth = Firebase.auth
@@ -56,6 +58,9 @@ class LoginActivity : AppCompatActivity() {
                 emailEditText.setError("Please enter a valid email address")
             }
             else{
+                progressBar.visibility = View.VISIBLE // Show progress bar
+                signInButton.visibility=View.GONE
+                signInButton.isEnabled = false // Disable button to prevent multiple clicks
                 loginUser(email,pass)
             }
 
@@ -63,36 +68,28 @@ class LoginActivity : AppCompatActivity() {
 
 
     }
+
     fun loginUser(email: String, password: String){
         MainScope().launch {
             try {
                 auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this@LoginActivity){task ->
+
                     if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(ContentValues.TAG, "Login with email password:success")
-                        Toast.makeText(
-                            baseContext,
-                            "Login Successfully.",
-                            Toast.LENGTH_SHORT,
-                        ).show()
                         val user = auth.currentUser
                         if (user != null) {
+                            progressBar.visibility = View.GONE // Hide progress bar
+                            signInButton.visibility=View.VISIBLE
+                            signInButton.isEnabled = true // Enable the button again
+
                             // Create an Intent to start LandingActivity1
                             val intent = Intent(this@LoginActivity, landing_1_activity::class.java)
-//                            intent.putExtra("USERNAME", user.displayName) // Use displayName for username
-//                            intent.putExtra("EMAIL", user.email) // Put email as well
-                            // Start LandingActivity1
                             startActivity(intent)
                             finish() // Optionally finish this activity if you don't want to go back to it
                         }
                     } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w(ContentValues.TAG, "Login:failure", task.exception)
-                        Toast.makeText(
-                            baseContext,
-                            "Login failed.",
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                        progressBar.visibility = View.GONE
+                        signInButton.visibility=View.VISIBLE
+                        signInButton.isEnabled = true
 
                     }
                 }

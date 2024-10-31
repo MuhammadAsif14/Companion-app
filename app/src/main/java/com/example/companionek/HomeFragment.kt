@@ -21,41 +21,21 @@ import com.example.companionek.data.Note
 import com.example.companionek.utils.DiaryItems
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import de.hdodenhof.circleimageview.CircleImageView
-import java.util.Date
 
 class HomeFragment : Fragment() {
 
     private lateinit var newRecyclerView: RecyclerView
     private lateinit var newRecyclerView2: RecyclerView
     private lateinit var noteRecyclerView: RecyclerView
-
     private lateinit var newArrayList: ArrayList<MoodItems>
     private lateinit var newArrayList2: ArrayList<ChatItems>
     private lateinit var diaryEntries: ArrayList<DiaryItems>
-
     private val notesArrayList = ArrayList<Pair<Note, String>>()
-
     private lateinit var fabMusic: FloatingActionButton
-
-    private lateinit var wImageId: Array<Int>
-    private lateinit var wTitle: Array<String>
-    private lateinit var wDay: Array<String>
-    private lateinit var wDate: Array<String>
-    private lateinit var dTitle: Array<String>
-    private lateinit var dContent: Array<String>
-    private lateinit var dDate: Array<Date>
-//
-//    private lateinit var mTitle: Array<String>
-//    private lateinit var mDay: Array<String>
-//    private lateinit var mDate: Array<String>
-//    private lateinit var cTitle: Array<String>
-//    private lateinit var cText: Array<String>
-//    private lateinit var profilepic:CircleImageView
-
-    private lateinit var database: DatabaseReference
     private var userId = FirebaseAuth.getInstance().currentUser?.uid
 
     override fun onCreateView(
@@ -113,8 +93,33 @@ class HomeFragment : Fragment() {
         getUserNoteData()
         // Load user profile
         loadUserProfile(rootView)
+        getToke()
         return rootView
     }
+    private fun getToke() {
+        FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+            updateToken(token)
+        }
+    }
+    private fun updateToken(token: String) {
+        // Get the current user ID, or return if not authenticated
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        // Reference to the user's FCM token field in the Realtime Database
+        val userRef = FirebaseDatabase.getInstance().getReference("users/$userId/fcmToken")
+
+        // Update the FCM token in the database
+        userRef.setValue(token)
+            .addOnSuccessListener {
+                Log.d("updateToken", "FCM token updated successfully")
+            }
+            .addOnFailureListener { exception ->
+                Log.e("updateToken", "Error updating FCM token", exception)
+            }
+    }
+
+
+
     private fun openNewChatActivity() {
         // Start your new chat activity or perform your action
         val intent = Intent(requireContext(), BackgroundMusicActivity::class.java)

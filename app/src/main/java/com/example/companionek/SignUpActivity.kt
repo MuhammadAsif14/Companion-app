@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.Nullable
@@ -51,6 +52,8 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var email: String
     private lateinit var displayName: String
     private lateinit var id:String
+    private lateinit var progressBar: ProgressBar
+
 
 
 
@@ -73,6 +76,7 @@ class SignUpActivity : AppCompatActivity() {
         displayNameEditText = findViewById(R.id.displayNameEditText) // Initialize the display name EditText
         profilePic= findViewById(R.id.profile_image)
         loginText=findViewById(R.id.joinNow)
+        progressBar = findViewById(R.id.progressBar) // Initializing the ProgressBar
 
         setGreetingBasedOnTime()
 
@@ -120,6 +124,9 @@ class SignUpActivity : AppCompatActivity() {
             }
 
            else if (email.isNotEmpty() && password.isNotEmpty() && displayName.isNotEmpty()) {
+                progressBar.visibility = View.VISIBLE // Show progress bar
+                signUpButton.visibility=View.GONE
+                signUpButton.isEnabled = false // Disable button to prevent multiple clicks
                 registerUser(email, password, displayName) // Pass display name to registerUser
             }
             else {
@@ -140,6 +147,7 @@ private fun registerUser(email: String, password: String, newDisplayName: String
     lifecycleScope.launch {
         try {
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+
                 if (task.isSuccessful) {
                     val id = task.result?.user?.uid ?: ""
                     storageReference = storage.reference.child("Upload").child(id)
@@ -154,7 +162,6 @@ private fun registerUser(email: String, password: String, newDisplayName: String
                                         if (isSuccess) {
                                             Log.d(TAG, "User added successfully.")
                                             //also adding in realtime db for chat feature
-
 
                                             launchLandingActivity()
                                         } else {
@@ -185,6 +192,9 @@ private fun registerUser(email: String, password: String, newDisplayName: String
                     Toast.makeText(baseContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
                 }
             }.addOnFailureListener { e ->
+                progressBar.visibility = View.GONE// Show progress bar
+                signUpButton.visibility=View.VISIBLE
+                signUpButton.isEnabled = true // Disable button to prevent multiple clicks
                 Log.e(TAG, "Authentication failed: ${e.message}")
                 Toast.makeText(baseContext, "Authentication failed: ${e.message}", Toast.LENGTH_SHORT).show()
             }
@@ -197,6 +207,9 @@ private fun registerUser(email: String, password: String, newDisplayName: String
 
     // Helper function to launch the landing activity
     private fun launchLandingActivity() {
+        progressBar.visibility = View.GONE// Show progress bar
+        signUpButton.visibility=View.VISIBLE
+        signUpButton.isEnabled = true // Disable button to prevent multiple clicks
         val intent = Intent(this@SignUpActivity, landing_1_activity::class.java)
         startActivity(intent)
         finish()

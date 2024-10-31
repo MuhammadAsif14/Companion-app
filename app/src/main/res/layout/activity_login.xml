@@ -160,18 +160,34 @@
 <!--                android:textColor="#96ffffff"-->
 <!--                android:textSize="16sp" />-->
 
-            <Button
-
-                android:id="@+id/signInButton"
-                android:layout_width="wrap_content"
+            <FrameLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/buttonshapewhitebg"
-                android:fontFamily="@font/calibri"
-                android:text="Sign in"
-                android:textAllCaps="false"
-                android:textColor="#96ffffff"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="20dp">
+                <Button
+
+                    android:id="@+id/signInButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/buttonshapewhitebg"
+                    android:fontFamily="@font/calibri"
+                    android:text="Sign in"
+                    android:textAllCaps="false"
+                    android:textColor="#96ffffff"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+                <ProgressBar
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:id="@+id/progressBar"
+                    android:layout_gravity="center"
+                    android:visibility="invisible">
+
+                </ProgressBar>
+
+            </FrameLayout>
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
