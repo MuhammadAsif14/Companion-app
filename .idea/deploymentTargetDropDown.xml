@@ -5,7 +5,13 @@
       <entry key="LatestMessagesActivity">
         <State />
       </entry>
+      <entry key="LoginActivity">
+        <State />
+      </entry>
       <entry key="NavBarActivity">
+        <State />
+      </entry>
+      <entry key="SignUpActivity">
         <State />
       </entry>
       <entry key="TestFaceDetection">

@@ -48,7 +48,7 @@
 	<color name="text_evening">#FFFFFF</color> <!-- DodgerBlue color for evening -->
 
 	<color name="edittext_morning_bg">#FFFACD</color> <!-- LemonChiffon for morning -->
-	<color name="edittext_afternoon_bg">#352302</color> <!-- Moccasin for afternoon -->
+	<color name="edittext_afternoon_bg">#E3B869</color> <!-- Moccasin for afternoon -->
 	<color name="edittext_evening_bg">#D3D3D3</color> <!-- LightGray for evening -->
 
 	<color name="button_morning_bg">#FFB6C1</color> <!-- LightPink for morning -->

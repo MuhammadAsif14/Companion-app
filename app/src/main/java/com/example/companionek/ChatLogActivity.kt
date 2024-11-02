@@ -3,10 +3,13 @@ package com.example.companionek
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.companionek.data.ChatMessage2
@@ -39,6 +42,50 @@ import java.util.Date
 import java.util.Locale
 
 class ChatLogActivity : AppCompatActivity() {
+
+        override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.delete_menu, menu)
+        return true
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_delete -> {
+                // Show confirmation dialog
+                AlertDialog.Builder(this)
+                    .setTitle("Confirm Deletion")
+                    .setMessage("Are you sure you want to delete this chat?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        // Delete chat messages if confirmed
+                        deleteChatMessages()
+                    }
+                    .setNegativeButton("No", null)
+                    .show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+    private fun deleteChatMessages() {
+        val user = intent.getParcelableExtra<Users>(NewMessageActivity.USER_KEY)
+        val toId = user?.userId ?: return
+        val refFromUser = FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId")
+//        val refToUser = FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId")
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                refFromUser.removeValue().await()  // Delete messages from the current user's node
+//                refToUser.removeValue().await()    // Delete messages from the recipient's node
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@ChatLogActivity, "Chat deleted", Toast.LENGTH_SHORT).show()
+                    adapter.clear() // Clear the adapter to remove deleted messages from the UI
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@ChatLogActivity, "Failed to delete chat", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
     companion object {
         val TAG = "ChatLog"
     }
@@ -46,11 +93,7 @@ class ChatLogActivity : AppCompatActivity() {
     private lateinit var send_button_chat_log:Button
     private lateinit var edittext_chat_log:EditText
     val adapter = GroupAdapter<GroupieViewHolder>()
-
-
     private val fromId = FirebaseAuth.getInstance().uid
-
-
     // Function to get access token from the service account JSON in assets
     suspend fun getAccessToken(context: Context): String? = withContext(Dispatchers.IO) {
         val serviceAccountStream = context.assets.open("service-accounts.json") // Ensure this matches your file name
@@ -59,16 +102,72 @@ class ChatLogActivity : AppCompatActivity() {
         googleCredentials.refreshIfExpired()
         googleCredentials.accessToken.tokenValue
     }
+//    fun sendFCMNotification(
+//        context: Context,
+//        receiverToken: String,
+//        senderName: String,
+//        title: String,
+//        message: String
+//    ) {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val accessToken = getAccessToken(context) ?: return@launch
+//            Log.d(TAG, "performSendMessage: $senderName")
+//            Log.d(TAG, "performSendMessage: $message")
+//
+//
+//            val fcmUrl = "https://fcm.googleapis.com/v1/projects/companion-11996/messages:send" // Replace with your project ID
+//
+//            val dataPayload = JSONObject().apply {
+//                put("title", title)
+//                put("senderName", senderName)
+//                put("message", message)
+//            }
+//
+//            val messagePayload = JSONObject().apply {
+//                put("token", receiverToken)
+//                put("data", dataPayload)
+//            }
+//
+//            val payload = JSONObject().apply {
+//                put("message", messagePayload)
+//            }
+//
+//            val client = OkHttpClient()
+//            val body = RequestBody.create("application/json; charset=utf-8".toMediaType(), payload.toString())
+//            val request = Request.Builder()
+//                .url(fcmUrl)
+//                .addHeader("Authorization", "Bearer $accessToken")
+//                .addHeader("Content-Type", "application/json")
+//                .post(body)
+//                .build()
+//
+//            client.newCall(request).enqueue(object : Callback {
+//                override fun onFailure(call: Call, e: IOException) {
+//                    println("Failed to send FCM Notification: ${e.message}")
+//                }
+//
+//                override fun onResponse(call: Call, response: Response) {
+//                    if (response.isSuccessful) {
+//                        println("FCM Notification sent successfully")
+//                    } else {
+//                        println("Failed to send FCM Notification: ${response.body?.string()}")
+//                    }
+//                }
+//            })
+//        }
+//    }
 
     fun sendFCMNotification(
         context: Context,
         receiverToken: String,
         senderName: String,
-        title: String,
         message: String
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             val accessToken = getAccessToken(context) ?: return@launch
+            Log.d(TAG, "performSendMessage: $title")
+            Log.d(TAG, "performSendMessage: $message")
+
 
             val fcmUrl = "https://fcm.googleapis.com/v1/projects/companion-11996/messages:send" // Replace with your project ID
 
@@ -77,6 +176,7 @@ class ChatLogActivity : AppCompatActivity() {
                 put("senderName", senderName)
                 put("message", message)
             }
+
 
             val messagePayload = JSONObject().apply {
                 put("token", receiverToken)
@@ -111,28 +211,33 @@ class ChatLogActivity : AppCompatActivity() {
             })
         }
     }
-
-//    fun sendFCMNotification(
-//        context: Context,
-//        receiverToken: String,
-//        senderName: String,
-//        title: String,
-//        message: String
-//    ) {
-//        val accessToken = getAccessToken(context)
+//fun sendFCMNotification(
+//    context: Context,
+//    receiverToken: String,
+//    senderName: String,
+//    message: String
+//) {
+//    CoroutineScope(Dispatchers.IO).launch {
+//        val accessToken = getAccessToken(context) ?: return@launch
+//        Log.d(TAG, "Sender Name: $senderName")
+//        Log.d(TAG, "Message Content: $message")
+//
 //        val fcmUrl = "https://fcm.googleapis.com/v1/projects/companion-11996/messages:send" // Replace with your project ID
 //
-//        // Create data payload with senderName and message
+//        // Set both title and body as fields to ensure they're picked up
 //        val dataPayload = JSONObject().apply {
-//            put("title", title)
-//            put("senderName", senderName) // Add sender name here
-//            put("message", message)
+//            put("title", senderName)  // Sender's name will appear in title
+//            put("body", message)      // Message content will appear in body
 //        }
 //
-//        // Prepare the message payload with data instead of notification
+//        // Combine `data` and `notification` payloads to ensure delivery
 //        val messagePayload = JSONObject().apply {
 //            put("token", receiverToken)
-//            put("data", dataPayload)
+//            put("data", dataPayload)  // For custom data processing in the app
+//            put("notification", JSONObject().apply { // Add a notification payload to ensure compatibility
+//                put("title", senderName)
+//                put("body", message)
+//            })
 //        }
 //
 //        val payload = JSONObject().apply {
@@ -150,28 +255,27 @@ class ChatLogActivity : AppCompatActivity() {
 //
 //        client.newCall(request).enqueue(object : Callback {
 //            override fun onFailure(call: Call, e: IOException) {
-//                println("Failed to send FCM Notification: ${e.message}")
+//                Log.e(TAG, "Failed to send FCM Notification: ${e.message}")
 //            }
 //
 //            override fun onResponse(call: Call, response: Response) {
 //                if (response.isSuccessful) {
-//                    println("FCM Notification sent successfully")
+//                    Log.d(TAG, "FCM Notification sent successfully")
 //                } else {
-//                    println("Failed to send FCM Notification: ${response.body?.string()}")
+//                    Log.e(TAG, "Failed to send FCM Notification: ${response.body?.string()}")
 //                }
 //            }
 //        })
 //    }
+//}
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_log)
         recyclerview_chat_log=findViewById(R.id.recyclerview_chat_log)
         send_button_chat_log=findViewById(R.id.send_button_chat_log)
         edittext_chat_log=findViewById(R.id.edittext_chat_log)
-
-
-//        val username= intent.getStringExtra(NewMessageActivity.USER_KEY)
-
         val user = intent.getParcelableExtra<Users>(NewMessageActivity.USER_KEY)
         if (user != null) {
             supportActionBar?.title = user.userName
@@ -181,11 +285,9 @@ class ChatLogActivity : AppCompatActivity() {
             performSendMessage()
         }
         listenForMessages()
-
         recyclerview_chat_log.adapter = adapter
     }
     private fun listenForMessages() {
-
         val user = intent.getParcelableExtra<Users>(NewMessageActivity.USER_KEY)
         val toId = user?.userId
         val ref = FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId")
@@ -208,109 +310,38 @@ class ChatLogActivity : AppCompatActivity() {
         }?.addOnFailureListener { exception ->
             Log.e("FCM Token", "Failed to retrieve FCM token", exception)
         }
-
-
-
         ref.addChildEventListener(object: ChildEventListener {
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
                 val chatMessage = p0.getValue(ChatMessage2::class.java)
-
                 if (chatMessage != null) {
                     Log.d(TAG, chatMessage.text)
                     if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
-
                         adapter.add(ChatToItem(chatMessage.text, chatMessage.isseen,chatMessage.timestamp))
-
                     } else {
                         val toref = FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId/${chatMessage.id}")
                         toref.child("isseen").setValue(true)
                         adapter.add(ChatFromItem(chatMessage.text,chatMessage.timestamp))
-
                     }
-
                 }
                 recyclerview_chat_log.scrollToPosition(adapter.itemCount-1)
-
             }
-
-
             override fun onCancelled(p0: DatabaseError) {
-
             }
-
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-
             }
-
             override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-
             }
-
             override fun onChildRemoved(p0: DataSnapshot) {
-
             }
-
         })
-
     }
-//private fun performSendMessage() {
-//    // how do we actually send a message to firebase...
-//    val text = edittext_chat_log.text.toString()
-//    if (!text.isEmpty()) {
-//        val user = intent.getParcelableExtra<Users>(NewMessageActivity.USER_KEY)
-//        val toId = user?.userId
-//
-//        if (fromId == null) return
-//
-////    val reference = FirebaseDatabase.getInstance().getReference("/messages").push()
-//        val reference =
-//            FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()
-//        Log.d("FromDI-oID", "$reference")
-//        val toReference: DatabaseReference
-//
-//
-//        val chatMessage = toId?.let {
-//            ChatMessage2(
-//                reference.key!!,
-//                text,
-//                fromId,
-//                it,
-//                isseen = false,
-//                System.currentTimeMillis() / 1000
-//            )
-//
-//
-//        }
-//        reference.setValue(chatMessage)
-//            .addOnSuccessListener {
-//                Log.d(TAG, "Saved our chat message: ${reference.key}")
-//                edittext_chat_log.text.clear()
-//                recyclerview_chat_log.scrollToPosition(adapter.itemCount - 1)
-//            }
-//        toReference =FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId/${chatMessage?.id}")
-//        Log.d("oID-FromDI", "$toReference")
-//        toReference.setValue(chatMessage)
-//        val latestMessageRef =
-//            FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId/$toId")
-//        latestMessageRef.setValue(chatMessage)
-//
-//        val latestMessageToRef =
-//            FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
-//        latestMessageToRef.setValue(chatMessage)
-//    }
-//    else{
-//        Toast.makeText(this@ChatLogActivity, "Type something", Toast.LENGTH_SHORT).show()
-//
-//    }
-//}
-private fun performSendMessage() {
+    private fun performSendMessage() {
     val text = edittext_chat_log.text.toString()
+    edittext_chat_log.text.clear()
     if (text.isNotEmpty()) {
         val user = intent.getParcelableExtra<Users>(NewMessageActivity.USER_KEY)
         val toId = user?.userId
-
         if (fromId == null || toId == null) return
-
         // Launch a coroutine for the network operation
         CoroutineScope(Dispatchers.IO).launch {
             val reference = FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()
@@ -322,28 +353,22 @@ private fun performSendMessage() {
                 isseen = false,
                 System.currentTimeMillis() / 1000
             )
-
             try {
                 // Save the message in the sender's reference
                 reference.setValue(chatMessage).await()
-
                 // Save the message in the receiver's reference
                 val toReference = FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId/${chatMessage.id}")
                 toReference.setValue(chatMessage).await()
-
                 // Save the latest message reference
                 val latestMessageRef = FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId/$toId")
                 latestMessageRef.setValue(chatMessage).await()
-
                 val latestMessageToRef = FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
                 latestMessageToRef.setValue(chatMessage).await()
-
                 // Fetch the receiver's FCM token
                 val dataSnapshot = FirebaseDatabase.getInstance().getReference("users/$toId/fcmToken").get().await()
                 val receiverToken = dataSnapshot.getValue(String::class.java)
                 val fromId = FirebaseAuth.getInstance().uid
                 var senderName = "Name"
-
                 if (fromId != null) {
                     val userRef = FirebaseDatabase.getInstance().getReference("users/$fromId")
                     userRef.get().addOnSuccessListener { dataSnapshot ->
@@ -352,11 +377,10 @@ private fun performSendMessage() {
                         if (receiverToken != null) {
                             // Send the FCM notification with the updated sender's name
                             sendFCMNotification(
-                                this@ChatLogActivity, // Pass context here
+                                this@ChatLogActivity,
                                 receiverToken,
-                                senderName, // Use the retrieved sender's name here
-                                "New Message",
-                                text // The message text
+                                senderName,
+                                text // The message content
                             )
                         } else {
                             println("No FCM token for the receiver.")
@@ -365,15 +389,10 @@ private fun performSendMessage() {
                         println("Failed to retrieve sender's name: ${e.message}")
                     }
                 }
-
-
-
                 // Clear the text and scroll the RecyclerView on the main thread
                 withContext(Dispatchers.Main) {
-                    edittext_chat_log.text.clear()
                     recyclerview_chat_log.scrollToPosition(adapter.itemCount - 1)
                 }
-
             } catch (e: Exception) {
                 println("Error sending message: ${e.message}")
             }
@@ -382,10 +401,7 @@ private fun performSendMessage() {
         Toast.makeText(this@ChatLogActivity, "Type something", Toast.LENGTH_SHORT).show()
     }
 }
-
-
 }
-
 class ChatFromItem(val text: String, val time: Long): Item<GroupieViewHolder>() {
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         val textViewFrom = viewHolder.itemView.findViewById<TextView>(R.id.textViewFrom)

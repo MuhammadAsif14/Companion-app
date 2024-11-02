@@ -136,7 +136,7 @@ class chat_screen: AppCompatActivity() {
         recyclerView()
         clickEvents()
 
-        val random = (0..3).random()
+        val random = (0..2).random()
         customBotMessage("Hello! Today you're speaking with ${botList[random]}, how may I help?")
         cameraVector=findViewById(R.id.cameraVector)
         cameraVector.setOnClickListener {
@@ -212,7 +212,6 @@ private fun loadPreviousMessages() {
                 messagesList.add(message)
                 adapter.insertMessage(message) // Notify adapter about new item
                 Log.d("messageTag", "${message.message}")
-
                 rv_messages.scrollToPosition(adapter.itemCount - 1) // Scroll to the latest message
                 delay(100) // Wait for 500 milliseconds before displaying the next message
 
@@ -532,7 +531,7 @@ private fun loadPreviousMessages() {
         }, ContextCompat.getMainExecutor(this))
     }
     private fun loadModel(): Interpreter {
-        val assetFileDescriptor = assets.openFd("BestModel66.tflite")
+        val assetFileDescriptor = assets.openFd("model.tflite")
         val inputStream = assetFileDescriptor.createInputStream()
         val modelBytes = inputStream.readBytes()
         val buffer = ByteBuffer.allocateDirect(modelBytes.size).order(ByteOrder.nativeOrder())

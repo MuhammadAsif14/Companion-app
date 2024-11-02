@@ -40,9 +40,15 @@ class diary_activity : Activity() {
 
             title=titleEditText.text.toString()
             content=noteContentEditText.text.toString()
-            Toast.makeText(this,"title: $title", Toast.LENGTH_SHORT).show()
-            Toast.makeText(this,"content: $content", Toast.LENGTH_SHORT).show()
-            saveNote(title,content,noteId)
+            if(title.isNotEmpty()||content.isNotEmpty()){
+                saveNote(title,content,noteId)
+                Toast.makeText(this@diary_activity, "Note saved", Toast.LENGTH_SHORT).show()
+
+
+            }else{
+                Toast.makeText(this@diary_activity, "Empty Note title and content ", Toast.LENGTH_SHORT).show()
+
+            }
 
 
         }

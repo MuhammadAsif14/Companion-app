@@ -89,7 +89,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColorHint="#96ffffff"
+            android:textColorHint="#96000000"
             android:theme="@style/EditScreenTextInputLayoutStyle">
 
             <EditText
@@ -110,7 +110,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColorHint="#96ffffff"
+            android:textColorHint="#96000000"
             android:theme="@style/EditScreenTextInputLayoutStyle">
 
             <EditText

@@ -33,10 +33,13 @@ class SignUpActivity : AppCompatActivity() {
 
     private lateinit var imageView: ImageView
     private lateinit var greetingTextView: TextView
+
+    private lateinit var belowGreetingTV:TextView
     private lateinit var emailEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var confirmPassword: EditText
     private lateinit var displayNameEditText: EditText // New EditText for display name
+    private lateinit var loginTextView:TextView
     private lateinit var signUpButton: Button
     private lateinit var auth: FirebaseAuth
     private var emailPattern = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
@@ -56,6 +59,63 @@ class SignUpActivity : AppCompatActivity() {
 
 
 
+    private fun setGreetingBasedOnTime() {
+        // Get current hour
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+
+        // Change image and greeting based on the time of day
+        when {
+            hour in 5..11 -> { // Morning (5 AM to 11:59 AM)
+                imageView.setImageResource(R.drawable.morning_img)
+                greetingTextView.text = "Good Morning"
+                greetingTextView.setTextColor(Color.parseColor("#FFD700")) // Gold color
+                belowGreetingTV.setTextColor(resources.getColor(R.color.white))
+
+                emailEditText.setTextColor(resources.getColor(R.color.white))
+                passwordEditText.setTextColor(resources.getColor(R.color.white))
+                displayNameEditText.setTextColor(resources.getColor(R.color.white))
+                confirmPassword.setTextColor(resources.getColor(R.color.white))
+
+                // Button Background and Text Colors
+
+                val backgroundDrawable = resources.getDrawable(R.drawable.buttonshapegoldenbg)
+                signUpButton.background = backgroundDrawable
+                signUpButton.setTextColor(resources.getColor(R.color.black, theme))
+
+            }
+
+            hour in 12..16 -> { // Afternoon (12 PM to 4:59 PM)
+                imageView.setImageResource(R.drawable.afternoon)
+                greetingTextView.text = "Good Afternoon"
+                greetingTextView.setTextColor(Color.parseColor("#FF9800")) // OrangeRed color
+                belowGreetingTV.setTextColor(resources.getColor(R.color.black))
+                loginTextView.setTextColor(resources.getColor(R.color.black))
+
+                emailEditText.setTextColor(resources.getColor(R.color.text_afternoon, theme))
+                passwordEditText.setTextColor(resources.getColor(R.color.text_afternoon, theme))
+                displayNameEditText.setTextColor(resources.getColor(R.color.black))
+                confirmPassword.setTextColor(resources.getColor(R.color.black))
+                
+                val backgroundDrawable = resources.getDrawable(R.drawable.buttonshapegoldenbg)
+                signUpButton.background = backgroundDrawable
+                signUpButton.setTextColor(resources.getColor(R.color.text_afternoon, theme))
+
+            }
+
+            else -> { // Evening/Night (5 PM to 4:59 AM)
+                imageView.setImageResource(R.drawable.good_night_img)
+                greetingTextView.text = "Good Night"
+                emailEditText.setTextColor(resources.getColor(R.color.text_evening, theme))
+                passwordEditText.setTextColor(resources.getColor(R.color.text_evening, theme))
+
+
+
+            }
+
+
+        }
+//
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,12 +129,14 @@ class SignUpActivity : AppCompatActivity() {
         storage = FirebaseStorage.getInstance()
         imageView = findViewById(R.id.imageView)
         greetingTextView = findViewById(R.id.textView)
+        belowGreetingTV=findViewById(R.id.textView2)
         emailEditText = findViewById(R.id.emailEditText)  // Assume this is your EditText ID for email
         passwordEditText = findViewById(R.id.passwordEditText)  // Assume this is your EditText ID for password
         signUpButton = findViewById(R.id.signUpButton)  // Assume this is your Button ID for sign up
         confirmPassword=findViewById(R.id.confirmPassword)
         displayNameEditText = findViewById(R.id.displayNameEditText) // Initialize the display name EditText
         profilePic= findViewById(R.id.profile_image)
+        loginTextView=findViewById(R.id.loginText)
         loginText=findViewById(R.id.joinNow)
         progressBar = findViewById(R.id.progressBar) // Initializing the ProgressBar
 
@@ -255,52 +317,6 @@ private fun registerUser(email: String, password: String, newDisplayName: String
 
 
 
-    private fun setGreetingBasedOnTime() {
-        // Get current hour
-        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-
-        // Change image and greeting based on the time of day
-        when {
-            hour in 5..11 -> { // Morning (5 AM to 11:59 AM)
-                imageView.setImageResource(R.drawable.morning_img)
-                greetingTextView.text = "Good Morning"
-                greetingTextView.setTextColor(Color.parseColor("#FFD700")) // Gold color
-
-                emailEditText.setTextColor(resources.getColor(R.color.text_morning, theme))
-                passwordEditText.setTextColor(resources.getColor(R.color.text_morning, theme))
-                // Button Background and Text Colors
-                signUpButton.setBackgroundColor(resources.getColor(R.color.button_morning_bg, theme))
-                signUpButton.setTextColor(resources.getColor(R.color.text_morning, theme))
-
-            }
-
-            hour in 12..16 -> { // Afternoon (12 PM to 4:59 PM)
-                imageView.setImageResource(R.drawable.afternoon_img)
-                greetingTextView.text = "Good Afternoon"
-                greetingTextView.setTextColor(Color.parseColor("#FF9800")) // OrangeRed color
-                emailEditText.setTextColor(resources.getColor(R.color.text_afternoon, theme))
-                passwordEditText.setTextColor(resources.getColor(R.color.text_afternoon, theme))
-
-                // Button Background and Text Colors
-                signUpButton.setBackgroundColor(resources.getColor(R.color.button_afternoon_bg, theme))
-                signUpButton.setTextColor(resources.getColor(R.color.text_afternoon, theme))
-
-            }
-
-            else -> { // Evening/Night (5 PM to 4:59 AM)
-                imageView.setImageResource(R.drawable.good_night_img)
-                greetingTextView.text = "Good Night"
-                emailEditText.setTextColor(resources.getColor(R.color.text_evening, theme))
-                passwordEditText.setTextColor(resources.getColor(R.color.text_evening, theme))
-
-
-
-            }
-
-
-        }
-//
-    }
 
 
 

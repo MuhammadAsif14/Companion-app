@@ -35,54 +35,6 @@ class MyFirebaseMessaging : FirebaseMessagingService() {
         }
     }
 
-//    private fun sendNotification(remoteMessage: RemoteMessage) {
-//        val title = remoteMessage.data["title"]
-//        val message = remoteMessage.data["message"]
-//
-//        // Create an intent for opening the app when the notification is clicked
-//        val intent = Intent(this, MainActivity::class.java).apply {
-//            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//        }
-//        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-//
-//        // Define a Notification Channel for Android 8.0 and above
-//        val channelId = "CompanionEK_Channel"
-//        val channelName = "CompanionEK Notifications"
-//        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//            val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
-//            notificationManager.createNotificationChannel(channel)
-//        }
-//
-//        // Create and display the notification
-//        val notification = NotificationCompat.Builder(this, channelId)
-//            .setSmallIcon(R.drawable.logo) // replace with your notification icon
-//            .setContentTitle(title)
-//            .setContentText(message)
-//            .setAutoCancel(true)
-//            .setContentIntent(pendingIntent)
-//            .setPriority(NotificationCompat.PRIORITY_HIGH)
-//            .build()
-//
-//        with(NotificationManagerCompat.from(this)) {
-//            if (ActivityCompat.checkSelfPermission(
-//                    this@MyFirebaseMessaging,
-//                    Manifest.permission.POST_NOTIFICATIONS
-//                ) != PackageManager.PERMISSION_GRANTED
-//            ) {
-//                // TODO: Consider calling
-//                //    ActivityCompat#requestPermissions
-//                // here to request the missing permissions, and then overriding
-//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                //                                          int[] grantResults)
-//                // to handle the case where the user grants the permission. See the documentation
-//                // for ActivityCompat#requestPermissions for more details.
-//                return
-//            }
-//            notify(System.currentTimeMillis().toInt(), notification)
-//        }
-//    }
 private fun sendNotification(remoteMessage: RemoteMessage) {
     val senderName = remoteMessage.data["senderName"] ?: "New Message"
     val message = remoteMessage.data["message"]

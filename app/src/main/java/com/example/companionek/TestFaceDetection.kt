@@ -1,5 +1,6 @@
 package com.example.companionek
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -13,6 +14,7 @@ class TestFaceDetection : AppCompatActivity() {
 
     private val CAMERA_PERMISSION_REQUEST_CODE = 100
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test_face_detection)
@@ -32,6 +34,12 @@ class TestFaceDetection : AppCompatActivity() {
                     CAMERA_PERMISSION_REQUEST_CODE)
             }
         }
+        val buttonImage:Button=findViewById(R.id.button_image_emotion_detection)
+        buttonImage.setOnClickListener {
+               val intent =Intent(this,ImageCaptureActivity::class.java)
+                startActivity(intent)
+        }
+
     }
 
     // Handle the result of the permission request
