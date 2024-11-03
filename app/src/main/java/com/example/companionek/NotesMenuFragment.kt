@@ -17,6 +17,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class NotesMenuFragment : Fragment() {
+    override fun onResume() {
+        super.onResume()
+        getUserNoteData()  // Reload notes when the fragment resumes
+    }
 
     private lateinit var noteRecyclerView: RecyclerView
     private lateinit var fabNewNote: FloatingActionButton

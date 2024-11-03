@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:background="#212121">
@@ -16,6 +17,18 @@
 		android:layout_marginBottom="16dp"
 		android:contentDescription="Back"
 		android:src="@drawable/arrow_back_24px" />
+
+
+	<ImageView
+		android:id="@+id/ic_delete_button"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_margin="16dp"
+		android:layout_toStartOf="@+id/saveButton"
+		android:src="@drawable/ic_delete"
+		android:tint="@color/white">
+
+	</ImageView>
 	<ImageView
 		android:id="@+id/saveButton"
 		android:layout_width="wrap_content"

@@ -1,6 +1,8 @@
 package com.example.companionek
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -12,8 +14,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class diary_activity : Activity() {
+
+
     private var back_vector: ImageView? = null
     private lateinit var save_button:ImageView
+    private lateinit var delete_button:ImageView
     private lateinit var titleEditText:EditText
     private lateinit var noteContentEditText:EditText
     private lateinit var title:String
@@ -22,19 +27,46 @@ class diary_activity : Activity() {
     private var noteId:String? = null
 
     private var  userId = FirebaseAuth.getInstance().currentUser?.uid
+
+    @SuppressLint("MissingInflatedId")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.diary)
         back_vector = findViewById<View>(R.id.backButton) as ImageView
         save_button=findViewById(R.id.saveButton)
+        delete_button=findViewById(R.id.ic_delete_button)
         titleEditText=findViewById(R.id.titleEditText)
         noteContentEditText=findViewById(R.id.noteEditText)
-
         noteId = intent.getStringExtra("NOTE_ID")?:null
         Log.d("noteId: ","$noteId")
-        if(noteId!=null){
+        if (noteId != null) {
             loadNoteContent()
+            delete_button.setOnClickListener {
+                AlertDialog.Builder(this)
+                    .setTitle("Confirm Deletion")
+                    .setMessage("Are you sure you want to delete this note?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        // Delete note if confirmed
+                        val noteRef = firestore
+                            .collection("users")
+                            .document(userId!!)
+                            .collection("Notes")
+
+                        noteRef.document(noteId!!).delete()
+                            .addOnSuccessListener {
+                                Toast.makeText(this@diary_activity, "Note deleted successfully", Toast.LENGTH_SHORT).show()
+                                // Optionally, finish the activity or update the UI
+                                finish()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(this@diary_activity, "Error deleting note: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+                    .setNegativeButton("No", null)
+                    .show()
+            }
         }
+
 
         save_button.setOnClickListener{
 
@@ -55,6 +87,7 @@ class diary_activity : Activity() {
         //custom code goes here
         back_vector!!.setOnClickListener { finish() }
     }
+
     private fun loadNoteContent() {
         userId?.let { uid ->
             val noteRef = FirebaseFirestore.getInstance()
@@ -87,38 +120,6 @@ class diary_activity : Activity() {
     }
 
 
-
-//    fun saveNote(title: String, content: String) {
-//        if (userId != null&& noteId==null) {
-//            // Generate a unique document ID for the note
-//            val noteId = firestore
-//                .collection("users")
-//                .document(userId!!)
-//                .collection("Notes")
-//                .document().id
-//
-//            val note = Note(
-//                title = title,
-//                timestamp = System.currentTimeMillis(),
-//                content = content
-//            )
-//
-//            // Save the note in Firestore under the generated noteId
-//            firestore.collection("users")
-//                .document(userId!!)
-//                .collection("Notes")
-//                .document(noteId)
-//                .set(note)
-//                .addOnSuccessListener {
-//                    Log.d("SaveNote", "Note saved successfully with ID: $noteId")
-//                }
-//                .addOnFailureListener { e ->
-//                    Log.e("SaveNote", "Error saving note", e)
-//                }
-//        } else {
-//            Log.e("SaveNote", "User ID is null; cannot save note.")
-//        }
-//    }
 fun saveNote(title: String, content: String, noteId: String?) {
     if (userId != null) {
         // Reference to Firestore

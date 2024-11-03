@@ -102,60 +102,6 @@ class ChatLogActivity : AppCompatActivity() {
         googleCredentials.refreshIfExpired()
         googleCredentials.accessToken.tokenValue
     }
-//    fun sendFCMNotification(
-//        context: Context,
-//        receiverToken: String,
-//        senderName: String,
-//        title: String,
-//        message: String
-//    ) {
-//        CoroutineScope(Dispatchers.IO).launch {
-//            val accessToken = getAccessToken(context) ?: return@launch
-//            Log.d(TAG, "performSendMessage: $senderName")
-//            Log.d(TAG, "performSendMessage: $message")
-//
-//
-//            val fcmUrl = "https://fcm.googleapis.com/v1/projects/companion-11996/messages:send" // Replace with your project ID
-//
-//            val dataPayload = JSONObject().apply {
-//                put("title", title)
-//                put("senderName", senderName)
-//                put("message", message)
-//            }
-//
-//            val messagePayload = JSONObject().apply {
-//                put("token", receiverToken)
-//                put("data", dataPayload)
-//            }
-//
-//            val payload = JSONObject().apply {
-//                put("message", messagePayload)
-//            }
-//
-//            val client = OkHttpClient()
-//            val body = RequestBody.create("application/json; charset=utf-8".toMediaType(), payload.toString())
-//            val request = Request.Builder()
-//                .url(fcmUrl)
-//                .addHeader("Authorization", "Bearer $accessToken")
-//                .addHeader("Content-Type", "application/json")
-//                .post(body)
-//                .build()
-//
-//            client.newCall(request).enqueue(object : Callback {
-//                override fun onFailure(call: Call, e: IOException) {
-//                    println("Failed to send FCM Notification: ${e.message}")
-//                }
-//
-//                override fun onResponse(call: Call, response: Response) {
-//                    if (response.isSuccessful) {
-//                        println("FCM Notification sent successfully")
-//                    } else {
-//                        println("Failed to send FCM Notification: ${response.body?.string()}")
-//                    }
-//                }
-//            })
-//        }
-//    }
 
     fun sendFCMNotification(
         context: Context,
@@ -211,64 +157,6 @@ class ChatLogActivity : AppCompatActivity() {
             })
         }
     }
-//fun sendFCMNotification(
-//    context: Context,
-//    receiverToken: String,
-//    senderName: String,
-//    message: String
-//) {
-//    CoroutineScope(Dispatchers.IO).launch {
-//        val accessToken = getAccessToken(context) ?: return@launch
-//        Log.d(TAG, "Sender Name: $senderName")
-//        Log.d(TAG, "Message Content: $message")
-//
-//        val fcmUrl = "https://fcm.googleapis.com/v1/projects/companion-11996/messages:send" // Replace with your project ID
-//
-//        // Set both title and body as fields to ensure they're picked up
-//        val dataPayload = JSONObject().apply {
-//            put("title", senderName)  // Sender's name will appear in title
-//            put("body", message)      // Message content will appear in body
-//        }
-//
-//        // Combine `data` and `notification` payloads to ensure delivery
-//        val messagePayload = JSONObject().apply {
-//            put("token", receiverToken)
-//            put("data", dataPayload)  // For custom data processing in the app
-//            put("notification", JSONObject().apply { // Add a notification payload to ensure compatibility
-//                put("title", senderName)
-//                put("body", message)
-//            })
-//        }
-//
-//        val payload = JSONObject().apply {
-//            put("message", messagePayload)
-//        }
-//
-//        val client = OkHttpClient()
-//        val body = RequestBody.create("application/json; charset=utf-8".toMediaType(), payload.toString())
-//        val request = Request.Builder()
-//            .url(fcmUrl)
-//            .addHeader("Authorization", "Bearer $accessToken")
-//            .addHeader("Content-Type", "application/json")
-//            .post(body)
-//            .build()
-//
-//        client.newCall(request).enqueue(object : Callback {
-//            override fun onFailure(call: Call, e: IOException) {
-//                Log.e(TAG, "Failed to send FCM Notification: ${e.message}")
-//            }
-//
-//            override fun onResponse(call: Call, response: Response) {
-//                if (response.isSuccessful) {
-//                    Log.d(TAG, "FCM Notification sent successfully")
-//                } else {
-//                    Log.e(TAG, "Failed to send FCM Notification: ${response.body?.string()}")
-//                }
-//            }
-//        })
-//    }
-//}
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

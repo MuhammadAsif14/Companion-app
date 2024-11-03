@@ -33,7 +33,6 @@ import com.example.companionek.utils.Constants.RECEIVE_ID
 import com.example.companionek.utils.Constants.SEND_ID
 import com.example.companionek.utils.Time
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -80,22 +79,13 @@ class chat_screen: AppCompatActivity() {
     private lateinit var adapter: MessagingAdapter
     private lateinit var btn_send: Button
     private lateinit var cameraVector: ImageView
-//
-//    private lateinit var chatSessionRef: DatabaseReference
     private lateinit var chatSessionRef: DocumentReference
-
-    private lateinit var database:FirebaseDatabase
+    private lateinit var emotion: String
     private val firestore = FirebaseFirestore.getInstance()
-
     private var  userId = FirebaseAuth.getInstance().currentUser?.uid
     private var isSessionCreated = false // Flag to track if session is created
-
     private var chatSessionId: String? = null
-
-
-
     private val botList = listOf( "Ayesha", "Nizam", "Asif")
-
     private val client = OkHttpClient()
 
 
@@ -107,6 +97,12 @@ class chat_screen: AppCompatActivity() {
         rv_messages = findViewById(R.id.rv_messages) // Get the RecyclerView
         et_message = findViewById(R.id.et_message) // Get the EditText
         btn_send = findViewById(R.id.btn_send)
+        emotion= intent.getStringExtra("Emotion")?: "happy"
+        Log.d("Emotion", "onCreate: $emotion")
+        
+
+
+
 
         // Initialize camera executor
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -138,6 +134,7 @@ class chat_screen: AppCompatActivity() {
 
         val random = (0..2).random()
         customBotMessage("Hello! Today you're speaking with ${botList[random]}, how may I help?")
+
         cameraVector=findViewById(R.id.cameraVector)
         cameraVector.setOnClickListener {
             // Handle the click event here
@@ -255,7 +252,7 @@ private fun loadPreviousMessages() {
                 timestamp = System.currentTimeMillis(),
                 sender = sender
             )
-            val newEmotion = "sad"
+            val newEmotion = emotion
             addEmotionToSession(userId!!, chatSessionId!!, newEmotion)
 
             // Reference to the specific message document in Firestore
@@ -275,7 +272,6 @@ private fun loadPreviousMessages() {
                 }
         }
     }
-
 
     //to update the emotion of the user for each session
 
@@ -456,7 +452,7 @@ private fun loadPreviousMessages() {
             Log.d("CREATING SESSION WITH FIREBASE", "FIREBASE SESSIONID: $chatSessionId")
 
             // Example list of emotions (can be updated during conversation as needed)
-            val emotionsList = listOf("sad", "happy", "neutral")
+            val emotionsList = listOf(emotion)
 
             // Save initial emotions to the session
             chatSessionRef.set(hashMapOf("emotions" to emotionsList))

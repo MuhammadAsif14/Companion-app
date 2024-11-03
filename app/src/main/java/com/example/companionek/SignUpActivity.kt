@@ -33,6 +33,7 @@ class SignUpActivity : AppCompatActivity() {
 
     private lateinit var imageView: ImageView
     private lateinit var greetingTextView: TextView
+    private lateinit var selectProfile:TextView
 
     private lateinit var belowGreetingTV:TextView
     private lateinit var emailEditText: EditText
@@ -101,12 +102,26 @@ class SignUpActivity : AppCompatActivity() {
                 signUpButton.setTextColor(resources.getColor(R.color.text_afternoon, theme))
 
             }
+            hour in 17..22 -> { // Afternoon (5 PM to 10 PM)
+                imageView.setImageResource(R.drawable.good_night_img)
+                greetingTextView.text = "Good Evening"
+                selectProfile.setTextColor(resources.getColor(R.color.white))
+
+
+                emailEditText.setTextColor(resources.getColor(R.color.text_evening, theme))
+                passwordEditText.setTextColor(resources.getColor(R.color.text_evening, theme))
+
+                signUpButton.setTextColor(resources.getColor(R.color.white))
+
+
+            }
 
             else -> { // Evening/Night (5 PM to 4:59 AM)
                 imageView.setImageResource(R.drawable.good_night_img)
                 greetingTextView.text = "Good Night"
                 emailEditText.setTextColor(resources.getColor(R.color.text_evening, theme))
                 passwordEditText.setTextColor(resources.getColor(R.color.text_evening, theme))
+                signUpButton.setTextColor(resources.getColor(R.color.white))
 
 
 
@@ -129,6 +144,7 @@ class SignUpActivity : AppCompatActivity() {
         storage = FirebaseStorage.getInstance()
         imageView = findViewById(R.id.imageView)
         greetingTextView = findViewById(R.id.textView)
+        selectProfile=findViewById(R.id.selectProfile)
         belowGreetingTV=findViewById(R.id.textView2)
         emailEditText = findViewById(R.id.emailEditText)  // Assume this is your EditText ID for email
         passwordEditText = findViewById(R.id.passwordEditText)  // Assume this is your EditText ID for password

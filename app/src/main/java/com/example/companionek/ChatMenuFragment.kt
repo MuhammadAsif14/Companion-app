@@ -74,7 +74,16 @@ private fun getUserChatData() {
             .collection("users")
             .document(uid)
             .collection("chatSessions")
-
+        // Create a map linking emotion strings to drawable resource IDs
+        val emotionToImageMap = mapOf(
+            "happy" to R.drawable.happy_emoji,
+            "sad" to R.drawable.sad_emoji,
+            "angry" to R.drawable.angry_emoji,
+            "neutral" to R.drawable.neutral_emoji,
+            "surprised" to R.drawable.surprised_emoji,
+            "disgust" to R.drawable.tired_emoji,
+            "fearful" to R.drawable.fearful_emoji
+        )
         chatSessionsRef.get()
             .addOnSuccessListener { sessionsSnapshot ->
                 newArrayList2.clear() // Clear the list before adding new data
@@ -83,11 +92,14 @@ private fun getUserChatData() {
                     // Retrieve session ID
                     val sessionId = sessionSnapshot.id
                     // Retrieve emotions array from the session document
-                    val emotions = sessionSnapshot.get("emotions") as? List<String> ?: emptyList()
 
+                    val emotions = sessionSnapshot.get("emotions") as? List<String> ?: emptyList()
+                    // Choose the first available emotion or a default image if none match
+                    val emotionImage = emotions.firstNotNullOfOrNull { emotionToImageMap[it.toLowerCase()] }
+                        ?: R.drawable.neutral_emoji // Default to neutral if no match found
                     // Create a ChatItems instance for this chat session
                     val chatItem = ChatItems(
-                        image = R.drawable.happy_emoji, // Choose an appropriate image
+                        image = emotionImage, // Choose an appropriate image
                         chatTitle = emotions.joinToString(", "),
                         text = "Chat session with ${emotions.joinToString(", ")} emotions.",
                         sessionId = sessionId // Pass the session ID here

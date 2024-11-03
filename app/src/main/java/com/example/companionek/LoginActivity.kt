@@ -13,9 +13,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 
 class LoginActivity : AppCompatActivity() {
@@ -76,26 +81,26 @@ class LoginActivity : AppCompatActivity() {
             hour in 17..22 -> { // Afternoon (5 PM to 10 PM)
                 imageView.setImageResource(R.drawable.good_night_img)
                 greetingTextView.text = "Good Evening"
-                greetingTextView.setTextColor(Color.parseColor("#FF9800")) // OrangeRed color
-                emailEditText.setTextColor(resources.getColor(R.color.text_afternoon, theme))
-                passwordEditText.setTextColor(resources.getColor(R.color.text_afternoon, theme))
+                greetingTextView.setTextColor(resources.getColor(R.color.white)) // OrangeRed color
+                emailEditText.setTextColor(resources.getColor(R.color.white))
+                passwordEditText.setTextColor(resources.getColor(R.color.white))
+
                 val backgroundDrawable = resources.getDrawable(R.drawable.buttonshapewhitebg)
                 signInButton.background = backgroundDrawable
-                // Button Background and Text Colors
-                signInButton.setBackgroundColor(resources.getColor(R.color.button_afternoon_bg, theme))
-                signInButton.setTextColor(resources.getColor(R.color.text_afternoon, theme))
+                signInButton.setTextColor(resources.getColor(R.color.white))
 
             }
 
             else -> { // to 4:59 AM)
                 imageView.setImageResource(R.drawable.good_night_img)
                 greetingTextView.text = "Good Night"
-                emailEditText.setTextColor(resources.getColor(R.color.text_evening, theme))
-                passwordEditText.setTextColor(resources.getColor(R.color.text_evening, theme))
 
-                // Button Background and Text Colors
-                signInButton.setBackgroundColor(resources.getColor(R.color.button_evening_bg, theme))
-                signInButton.setTextColor(resources.getColor(R.color.text_evening, theme))
+                greetingTextView.setTextColor(resources.getColor(R.color.white)) // OrangeRed color
+                emailEditText.setTextColor(resources.getColor(R.color.text_afternoon, theme))
+                passwordEditText.setTextColor(resources.getColor(R.color.text_afternoon, theme))
+                val backgroundDrawable = resources.getDrawable(R.drawable.buttonshapewhitebg)
+                signInButton.background = backgroundDrawable
+                signInButton.setTextColor(resources.getColor(R.color.white))
 
 
             }
@@ -144,40 +149,161 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-    fun loginUser(email: String, password: String){
+
+    fun loginUser(email: String, password: String) {
         MainScope().launch {
             try {
-                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this@LoginActivity){task ->
-
+                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this@LoginActivity) { task ->
                     if (task.isSuccessful) {
                         val user = auth.currentUser
                         if (user != null) {
-                            progressBar.visibility = View.GONE // Hide progress bar
-                            signInButton.visibility=View.VISIBLE
-                            signInButton.isEnabled = true // Enable the button again
+                            updateLoginStreak(user.uid)
 
-                            // Create an Intent to start LandingActivity1
+                            progressBar.visibility = View.GONE
+                            signInButton.visibility = View.VISIBLE
+                            signInButton.isEnabled = true
+
+                            // Proceed to the next activity
                             val intent = Intent(this@LoginActivity, landing_1_activity::class.java)
                             startActivity(intent)
-                            finish() // Optionally finish this activity if you don't want to go back to it
+                            finish()
                         }
                     } else {
                         progressBar.visibility = View.GONE
-                        signInButton.visibility=View.VISIBLE
+                        signInButton.visibility = View.VISIBLE
                         signInButton.isEnabled = true
-
                     }
                 }
-
-                // Proceed to next activity or perform other actions with the user
             } catch (e: Exception) {
-                Toast.makeText(this@LoginActivity, "Registration failed: ${e.message}", Toast.LENGTH_LONG).show()
-                println(e.message)
+                Toast.makeText(this@LoginActivity, "Login failed: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+//    fun updateLoginStreak(userId: String) {
+//        val db = FirebaseFirestore.getInstance()
+//        val userRef = db.collection("users").document(userId)
+//
+//        userRef.get().addOnSuccessListener { document ->
+//            val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+//
+//            val lastLoginDate = document.getString("lastLoginDate")
+//            val currentStreak = document.getLong("currentStreak")?.toInt() ?: 0
+//            val longestStreak = document.getLong("longestStreak")?.toInt() ?: 0
+//
+//            val newStreakData = if (lastLoginDate != null && isYesterday(lastLoginDate, currentDate)) {
+//                val updatedCurrentStreak = currentStreak + 1
+//                val updatedLongestStreak = maxOf(longestStreak, updatedCurrentStreak)
+//                mapOf(
+//                    "lastLoginDate" to currentDate,
+//                    "currentStreak" to updatedCurrentStreak,
+//                    "longestStreak" to updatedLongestStreak
+//                )
+//            } else if (lastLoginDate == currentDate) {
+//                // If logged in today, no streak update
+//                mapOf("lastLoginDate" to currentDate)
+//            } else {
+//                // Reset streak if last login was more than a day ago
+//                mapOf(
+//                    "lastLoginDate" to currentDate,
+//                    "currentStreak" to 1,
+//                    "longestStreak" to longestStreak
+//                )
+//            }
+//
+//            // Update streak information in Firestore
+//            userRef.update(newStreakData)
+//                .addOnSuccessListener {
+//                    // Also add the current date to the loginDates array field in Firestore
+//                    userRef.update("loginDates", FieldValue.arrayUnion(currentDate))
+//                }
+//                .addOnFailureListener { exception ->
+//                    println("Error updating streak data: ${exception.message}")
+//                }
+//        }
+//    }
+//
+//    // Helper function to check if a date is yesterday
+//    fun isYesterday(lastLoginDate: String, currentDate: String): Boolean {
+//        val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+//        val lastDate = format.parse(lastLoginDate)
+//        val currentDateObj = format.parse(currentDate)
+//
+//        val calendar = Calendar.getInstance()
+//        calendar.time = currentDateObj
+//        calendar.add(Calendar.DAY_OF_YEAR, -1)
+//
+//        return lastDate == calendar.time
+//    }
+fun updateLoginStreak(userId: String) {
+    val db = FirebaseFirestore.getInstance()
+    val userRef = db.collection("users").document(userId)
+
+    userRef.get().addOnSuccessListener { document ->
+        val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+        // Retrieve last login data, initialize streaks if missing
+        val lastLoginDate = document.getString("lastLoginDate")
+        val currentStreak = document.getLong("currentStreak")?.toInt() ?: 1
+        val longestStreak = document.getLong("longestStreak")?.toInt() ?: 1
+
+        val newStreakData = when {
+            lastLoginDate == null -> {
+                // First-time login or data not yet set; start both streaks at 1
+                mapOf(
+                    "lastLoginDate" to currentDate,
+                    "currentStreak" to 1,
+                    "longestStreak" to 1
+                )
+            }
+            lastLoginDate == currentDate -> {
+                // If logged in today, no need to update the streak values
+                mapOf("lastLoginDate" to currentDate)
+            }
+            isYesterday(lastLoginDate, currentDate) -> {
+                // If logged in yesterday, continue the streak
+                val updatedCurrentStreak = currentStreak + 1
+                val updatedLongestStreak = maxOf(longestStreak, updatedCurrentStreak)
+                mapOf(
+                    "lastLoginDate" to currentDate,
+                    "currentStreak" to updatedCurrentStreak,
+                    "longestStreak" to updatedLongestStreak
+                )
+            }
+            else -> {
+                // If last login was more than a day ago, reset the streak
+                mapOf(
+                    "lastLoginDate" to currentDate,
+                    "currentStreak" to 1,
+                    "longestStreak" to longestStreak
+                )
             }
         }
 
+        // Update streak information in Firestore
+        userRef.update(newStreakData)
+            .addOnSuccessListener {
+                // Also add the current date to the loginDates array field in Firestore
+                userRef.update("loginDates", FieldValue.arrayUnion(currentDate))
+            }
+            .addOnFailureListener { exception ->
+                println("Error updating streak data: ${exception.message}")
+            }
     }
+}
 
+
+    // Helper function to check if a date is yesterday
+    fun isYesterday(lastLogin: String, currentDate: String): Boolean {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val lastDate = dateFormat.parse(lastLogin)
+        val currentDateObj = dateFormat.parse(currentDate)
+
+        val calendar = Calendar.getInstance()
+        calendar.time = currentDateObj!!
+        calendar.add(Calendar.DAY_OF_YEAR, -1)
+        return lastDate == calendar.time
+    }
 
 
     fun joinNowListener(view: View) {
