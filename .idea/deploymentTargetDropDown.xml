@@ -11,6 +11,9 @@
       <entry key="NavBarActivity">
         <State />
       </entry>
+      <entry key="RealTimeFaceDetectionActivity">
+        <State />
+      </entry>
       <entry key="SignUpActivity">
         <State />
       </entry>

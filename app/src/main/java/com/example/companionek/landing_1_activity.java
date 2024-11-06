@@ -298,7 +298,7 @@ public class landing_1_activity extends AppCompatActivity {
 		});
 
 		currentimage.setOnClickListener(v -> {
-			if (!emojiString[currentImageIndex].equals("happy")) {
+			if (!emojiString[currentImageIndex].equals("Happy")) {
 				showChatAlert(emojiString[currentImageIndex]);
 			}
 		});

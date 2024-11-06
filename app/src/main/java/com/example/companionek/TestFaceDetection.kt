@@ -8,7 +8,6 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.companionek.facedetection.FaceDetectionActivity
 
 class TestFaceDetection : AppCompatActivity() {
 
@@ -61,7 +60,7 @@ class TestFaceDetection : AppCompatActivity() {
 
     // Function to start FaceDetectionActivity
     private fun startFaceDetectionActivity() {
-        val intent = Intent(this, FaceDetectionActivity::class.java)
+        val intent = Intent(this, RealTimeFaceDetectionActivity::class.java)
         startActivity(intent)
     }
 }

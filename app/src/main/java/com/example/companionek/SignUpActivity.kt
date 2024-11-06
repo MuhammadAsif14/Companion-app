@@ -131,15 +131,10 @@ class SignUpActivity : AppCompatActivity() {
         }
 //
     }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
-
-
         auth = Firebase.auth
-
         database = FirebaseDatabase.getInstance()
         storage = FirebaseStorage.getInstance()
         imageView = findViewById(R.id.imageView)
@@ -155,18 +150,12 @@ class SignUpActivity : AppCompatActivity() {
         loginTextView=findViewById(R.id.loginText)
         loginText=findViewById(R.id.joinNow)
         progressBar = findViewById(R.id.progressBar) // Initializing the ProgressBar
-
         setGreetingBasedOnTime()
-
         profilePic.setOnClickListener(View.OnClickListener { // Handle click event here
             val intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.type = "image/*"
             startActivityForResult(Intent.createChooser(intent,"Select Picture"),10);
-
         })
-
-
-
         // Set button click listener to register user
         signUpButton.setOnClickListener {
             email = emailEditText.text.toString().trim()
@@ -282,7 +271,6 @@ private fun registerUser(email: String, password: String, newDisplayName: String
         }
     }
 }
-
     // Helper function to launch the landing activity
     private fun launchLandingActivity() {
         progressBar.visibility = View.GONE// Show progress bar
@@ -308,9 +296,6 @@ private fun registerUser(email: String, password: String, newDisplayName: String
             }
         }
     }
-
-
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 10) {
@@ -320,21 +305,6 @@ private fun registerUser(email: String, password: String, newDisplayName: String
             }
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 

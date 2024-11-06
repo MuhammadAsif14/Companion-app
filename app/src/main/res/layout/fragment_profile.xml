@@ -10,45 +10,113 @@
     android:paddingTop="16dp"
     tools:context=".ProfileFragment">
 
-<LinearLayout
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:orientation="horizontal"
-android:gravity="center">
+    <!-- Profile Picture and Username Layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="16dp">
 
-<!-- Streak Information -->
-<TextView
-    android:id="@+id/longest_streak"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Longest Streak: 0 days"
-    android:textSize="16sp"
-    android:textStyle="bold"
-    android:paddingEnd="20dp" />
+        <!-- CircleImageView for Profile Picture -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/profile"
+        android:layout_marginEnd="16dp" />
 
-<TextView
-    android:id="@+id/current_streak"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Current Streak: 0 days"
-    android:textSize="16sp"
-    android:textStyle="bold" />
-</LinearLayout>
+        <!-- EditText for Username -->
+        <EditText
+            android:id="@+id/edit_username"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Enter username"
+            android:textSize="18sp"
+            android:padding="10dp"
+            android:background="@android:drawable/edit_text"
+            android:inputType="textPersonName" />
+    </LinearLayout>
 
-<!--    &lt;!&ndash; Calendar View &ndash;&gt;-->
-<!--    <CalendarView-->
-<!--        android:id="@+id/calendar_view"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="300dp"-->
-<!--        android:layout_marginTop="8dp"/>-->
+    <!-- Streak Information -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
 
-    <!-- Replace CalendarView with MaterialCalendarView -->
+        <TextView
+            android:id="@+id/longest_streak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Longest Streak: 0 days"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:paddingEnd="20dp" />
+
+        <TextView
+            android:id="@+id/current_streak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Current Streak: 0 days"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/calendar_view"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:layout_marginTop="20dp"
-        />
+        android:layout_marginTop="20dp" />
+</LinearLayout>
+
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+
+<!--<LinearLayout-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:orientation="vertical"-->
+<!--    android:paddingTop="16dp"-->
+<!--    tools:context=".ProfileFragment">-->
+
+<!--    -->
 
 
-    </LinearLayout>
+<!--<LinearLayout-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:orientation="horizontal"-->
+<!--android:gravity="center">-->
+
+<!--&lt;!&ndash; Streak Information &ndash;&gt;-->
+<!--<TextView-->
+<!--    android:id="@+id/longest_streak"-->
+<!--    android:layout_width="wrap_content"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:text="Longest Streak: 0 days"-->
+<!--    android:textSize="16sp"-->
+<!--    android:textStyle="bold"-->
+<!--    android:paddingEnd="20dp" />-->
+
+<!--<TextView-->
+<!--    android:id="@+id/current_streak"-->
+<!--    android:layout_width="wrap_content"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:text="Current Streak: 0 days"-->
+<!--    android:textSize="16sp"-->
+<!--    android:textStyle="bold" />-->
+<!--</LinearLayout>-->
+
+<!--    <com.prolificinteractive.materialcalendarview.MaterialCalendarView-->
+<!--        android:id="@+id/calendar_view"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="300dp"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        />-->
+
+
+<!--</LinearLayout>-->

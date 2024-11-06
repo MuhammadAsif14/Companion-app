@@ -106,7 +106,6 @@ private fun getUserChatData() {
                     )
                     newArrayList2.add(chatItem) // Add the session item to the list
                 }
-
                 // Notify the adapter of the data change
                 newRecyclerView2.adapter = ChatAdapter(newArrayList2, ::onChatItemClick)
             }

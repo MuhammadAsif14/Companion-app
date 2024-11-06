@@ -126,8 +126,6 @@ private fun showChatAlert(emotion: String) {
 
     alertDialog.show()
 }
-
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
