@@ -57,7 +57,7 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 For queries, feel free to reach out:
 - **Developer**: Muhammad Asif
 - **Email**: cop21cancer@example.com
-- **LinkedIn**: [Your LinkedIn Profile]([https://linkedin.com/in/yourprofile](https://www.linkedin.com/in/muhammad-asif923321377445/))
+- **LinkedIn**: https://www.linkedin.com/in/muhammad-asif923321377445/
 
 ---
 
